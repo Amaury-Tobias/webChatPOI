@@ -23,3 +23,5 @@ Puedes en la consola introduciar ":u" para hacer los de la lista de usuarios.
 * Hoja de estilo CSS (completa).
 * Login de usuarios.
 * MongoDB support.
+
+ⓒAmaury Tobias Quiroz | UANL-FCFM
