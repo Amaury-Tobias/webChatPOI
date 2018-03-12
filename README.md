@@ -6,7 +6,7 @@ Necesita de:
 * Express
 * Socket.io
 
-** SETUP **
+**SETUP**
 Colocar ambas carpetas en dentro de una carpeta Main.
 
 ```[javascript]
@@ -15,7 +15,7 @@ node Main/server/main.js
 
 Puedes en la consola introduciar ":u" para hacer los de la lista de usuarios.
 
-** TODO **
+**TODO**
 * Funcionalidad completa en Safari.
 * agregar Video llamada WebRTC.
 * Hoja de estilo CSS (completa).
