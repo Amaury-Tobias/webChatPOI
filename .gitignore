@@ -1,2 +1,7 @@
 
 .DS_Store
+public/jquery.js
+etc
+node_module
+package.json
+package-lock.json
