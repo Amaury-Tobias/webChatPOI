@@ -1,0 +1,10 @@
+body{
+  text-align: center;
+}
+
+#messages{
+  height: 15em;
+  width: 100%;
+  background-color: gray;
+  overflow: scroll;
+}

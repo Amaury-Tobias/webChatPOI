@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FusufumChat</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="jquery.js"></script>
+  <script src="main.js"></script>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <h2 id="myName"></h2>
+  <div id="messages"></div>
+  <br/>
+  <form onsubmit="return addMessage(this)">
+    <input type="text" id="username" placeholder="Para" >
+    <input type="text" id="texto" placeholder="Cuéntanos algo...">
+    <input type="submit" value="Enviar!">
+  </form>
+</body>
+</html>
