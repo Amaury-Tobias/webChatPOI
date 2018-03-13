@@ -11,6 +11,9 @@ Necesita de:
 Colocar ambas carpetas en dentro de una carpeta Main.
 
 ```[javascript]
+//En el main folder
+npm installe express --save
+npm install socket.io --save
 node Main/server/main.js
 ```
 
