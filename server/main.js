@@ -34,7 +34,11 @@ io.on('connection', (socket) => {
     console.log(`New user: ${data.user}, ${data.id}`);
     users.push(data);
     io.emit(`userList`, users);
-  })
+  });
+  
+  socket.on('stream', (data) => {
+    console.log("Frame de Video");
+  });
 });
 
 rl.prompt();
