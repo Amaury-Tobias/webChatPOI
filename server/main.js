@@ -6,11 +6,7 @@ const readLine = require('readline');
 
 var users = []
 
-const rl = readLine.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  prompt: 'chatLOG > '
-});
+
 
 app.use(express.static('public'));
 
@@ -18,31 +14,60 @@ app.use(function (req, res, next) {
   res.status(404).send('Error 404');
 });
 
-io.on('connection', (socket) => {
-  console.log(`New Conect: ${socket.id}`);
 
-  socket.on('new-message', (data) => {
+io.on('connection', (socket) => {
+  
+  socket.on('add user', (data) => {
+    console.log(`New user: ${data.user}, ${socket.id}`);
+    users.push({
+      user: data.user,
+      id: socket.id
+    });
+    socket.emit('login', data);
+    //io.emit(`userList`, users);
+  });
+
+  socket.on('new message', (data) => {
     users.forEach(element => {
       if (element.user == data.to) {
-        console.log(`From ${data.author} (${data.id})\nto ${element.user} (${element.id})\nText:(${data.text})\n`);
-        io.to(element.id).emit('messages', data);
+        //console.log(`From ${data.username}\nto ${element.user}\n`);
+        io.to(element.id).emit('new message', {
+          username: data.username,
+          message: data.message
+        });
+      }
+    });
+  });
+  
+  socket.on('callFromTo', (data) =>{
+    users.forEach(element => {
+      if (element.user == data.callTO) {
+        console.log(`Call from ${data.callFrom} \nto ${element.id}`);
+        io.to(element.id).emit('NewCall', data);
       }
     });
   });
 
-  socket.on('new-connection', (data) => {
-    console.log(`New user: ${data.user}, ${data.id}`);
-    users.push(data);
-    io.emit(`userList`, users);
-  });
-  
   socket.on('stream', (data) => {
-    console.log("Frame de Video");
+    io.emit('frameStream',data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`\nUser ${socket.id} disconnected`);
+    users.splice(users.indexOf(socket.id), 1);
   });
 });
 
-rl.prompt();
 
+
+
+//////READ_LINE
+const rl = readLine.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: 'chatLOG > '
+});
+rl.prompt();
 rl.on('line', (input) => {
   switch (input) {
     case ':u':
@@ -57,5 +82,5 @@ rl.on('line', (input) => {
 });
 
 server.listen(8080, function() {
-  console.log("Servidor corriendo en http://localhost:8080");
+  console.log("\nServidor corriendo en http://localhost:8080");
 });
