@@ -27,21 +27,67 @@ ul {
   list-style: none;
   word-wrap: break-word;
 }
+.mainGrid {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .pages {
   height: 100%;
   margin: 0;
   padding: 0;
-  width: 100%;
+  width: 80%;
 }
 .page {
   height: 100%;
   position: absolute;
-  width: 100%;
+  width: 80%;
+  background-color: #ece5dd;
 }
+
+/* Contacts List */
+.contactList {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #128c7e;
+  align-content: center;
+  align-items: center;
+  text-align: center;
+}
+.contact {
+  padding: 8px;
+  background-color: #128c7e;
+  position: relative;
+  text-align: left;
+  cursor: pointer;
+  transition-duration: 800ms;
+}
+
+.contact:hover {
+  background-color: #51bdb0;
+}
+.contactImage {
+  position: relative;
+  width: 25%;
+  border-radius: 50%;
+}
+
+.contactName {
+  position: absolute;
+  margin: 0 0 0 0.5em;
+  display: inline;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 /* Login Page */
 
 .login.page {
-  background-color: #000;
+  background-color: #fff;
 }
 .login.page .form {
   height: 100px;
@@ -55,7 +101,7 @@ ul {
 .login.page .form .usernameInput {
   background-color: transparent;
   border: none;
-  border-bottom: 2px solid #fff;
+  border-bottom: 2px solid #128c7e;
   outline: none;
   padding-bottom: 15px;
   text-align: center;
@@ -69,7 +115,7 @@ ul {
   letter-spacing: 3px;
 }
 .login.page .title, .login.page .usernameInput {
-  color: #fff;
+  color: #000;
   font-weight: 100;
 }
 /* Chat page */

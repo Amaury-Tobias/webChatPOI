@@ -13,15 +13,17 @@ $(function () {
   var $inputMessage = $('.inputMessage');
   var $inputMessageU = $('.inputMessageU');
   var $title = $('#title');
+  var $contactList = $('.contactList')
+  var $contact = $('.contact');
 
   var $loginPage = $('.login.page');
   var $chatPage = $('.chat.page');
 
   var username;
-  var connected = false;
   var typing = false;
-  var lastTypingTime;
   var $currentInput = $usernameInput.focus();
+
+  var currentChat;
 
   var socket = io();
 
@@ -75,15 +77,11 @@ $(function () {
   function sendMessage () {
     var message = $inputMessage.val();    
     message = cleanInput(message);
-    var messageTo = $inputMessageU.val();
-    console.log(messageTo);
-    messageTo = cleanInput(messageTo);
-    console.log(messageTo);
 
     dataMessage = {
       username: username,
       message: message,
-      to: messageTo
+      to: currentChat
     };
     if (message) {
       $inputMessage.val('');
@@ -126,15 +124,10 @@ $(function () {
 
     addMessageElement($messageDiv, options);
   }
-  // Typing Events
-  function getTypingMessages (data) {
-    return $('.typing.message').filter(function (i) {
-      return $(this).data('username') === data.username;
-    });
-  }
+
 
   // Element Events
-  $window.keydown( (event) => {
+  $window.keydown( function (event) {
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
       $currentInput.focus();
     }
@@ -148,20 +141,46 @@ $(function () {
       }
     }
   });
-  $loginPage.click( () => {
+  $loginPage.click( function () {
     $currentInput.focus();
   });
-  $inputMessage.click( () => {
+  $inputMessage.click( function () {
     $inputMessage.focus();
   });
 
-  socket.on('login', (data) => {
-    connected = true;
+  $contactList.on("click", ".contact", function () {
+    currentChat = $(this).attr('id');
+  });
+
+/*  socket.on('login', (data) => {
     var message = "Login";
     log(message, {
       prepend: true
     });
   });
+*/
+  socket.on('usersList', function (data) {
+    $contactList.html("");
+    console.log(data);
+    data.forEach(element => {
+      if (element.user != username) {
+        var $contactName = $('<p class="contactName" />')
+        .text(element.user);
+  
+        var $contactImage = $('<img class="contactImage" />')
+        .attr('src', "asd.jpg");
+  
+        var $newContact = $('<li />')
+        .addClass('contact')
+        .attr('id', element.id)
+        .append($contactImage, $contactName);
+        $contactList.append($newContact);
+      }
+    });
+    //var $contact = $('.contact');
+  });
+
+
 
   socket.on('new message', (data) => {
     addChatMessage(data);
@@ -177,7 +196,7 @@ $(function () {
     }
   });
 
-  socket.on('disconnect', function () {
+  socket.on('disconnect', () => {
     log('Error de conexión');
   });
 
@@ -186,6 +205,8 @@ $(function () {
   });
 
 });
+
+
 /*
 var video;
 var img;

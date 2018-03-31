@@ -1,36 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <title id="title">FusufumChat</title>
+  <link rel="shortcut icon" href="3.png" type="image/png">
   <script src="/socket.io/socket.io.js"></script>
-  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="jquery.js"></script>
   <script src="main.js"></script>
   <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="emojis.css">
 </head>
 <body>
 
-<ul class="pages" >
-  <li class="chat page">
-    <div class="chatArea">
-      <ul class="messages"></ul>
-    </div>
-    <input class="inputMessageU" id="username">
-    <input class="inputMessage" id="texto" placeholder="Type here...">
-  </li>
+  <div class="mainGrid">
 
-  <li class="login page">
-      <div class="form">
-        <h3 class="title">What's your nickname?</h3>
-        <input class="usernameInput" type="text" maxlength="14" />
-      </div>
-    </li>
-</ul>
+    <ul id="contactList" class="contactList">
 
+    </ul>
 
+    <ul class="pages" >
+      <li class="chat page">
+        <div class="chatArea">
+          <ul class="messages"></ul>
+        </div>
+        <!-- <input class="inputMessageU" id="username"> -->
+        <input class="inputMessage" id="texto" placeholder="Type here...">
+        <ul>
+            <li>🙂</li>
+          </ul>
+      </li>
 
+      <li class="login page">
+          <div class="form">
+            <h3 class="title">¿Cual es tu nickname?</h3>
+            <input class="usernameInput" type="text" maxlength="14" />
+          </div>
+      </li>
+    </ul>
+  </div>
 
+  <div>
+    <ul id="emojis"></ul>
+  </div>
+
+<!-- 
   <h2 id="myName"></h2>
   <div id="messages"></div>
   <br/>
@@ -44,5 +57,6 @@
   <video id="video" width="240px"></video>
   <div id="callsContainer"></div>
   <img id="reciver" width="240px"></img>
+   -->
 </body>
 </html>
