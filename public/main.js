@@ -147,18 +147,10 @@ $(function () {
   $inputMessage.click( function () {
     $inputMessage.focus();
   });
-
   $contactList.on("click", ".contact", function () {
     currentChat = $(this).attr('id');
   });
 
-/*  socket.on('login', (data) => {
-    var message = "Login";
-    log(message, {
-      prepend: true
-    });
-  });
-*/
   socket.on('usersList', function (data) {
     $contactList.html("");
     console.log(data);
@@ -177,10 +169,7 @@ $(function () {
         $contactList.append($newContact);
       }
     });
-    //var $contact = $('.contact');
   });
-
-
 
   socket.on('new message', (data) => {
     addChatMessage(data);

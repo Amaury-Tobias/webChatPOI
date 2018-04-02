@@ -13,7 +13,7 @@ Necesita de:
 ```[javascript]
 //En el main folder
 npm install
-node start
+npm start
 ```
 
 

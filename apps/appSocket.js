@@ -20,12 +20,14 @@ module.exports = function (io, users) {
         })
 
         socket.on('disconnect', () => {
-            winston.info(users)
-            users.splice(users.indexOf(socket.id), 1)
-            winston.info('-----------')
-            winston.info(users)
-            io.sockets.emit('usersList', users);
-            //winston.info(users);
-        });
+            let leftUser = users.find(item => {
+                return item.id === socket.id
+            })
+            leftUser = users.indexOf(leftUser)
+            if (leftUser != -1) {
+                users.splice(leftUser, 1)
+                io.sockets.emit('usersList', users);
+            }
+        })
     })
 }

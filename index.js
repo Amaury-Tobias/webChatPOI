@@ -15,26 +15,6 @@ appSocket(io, users);
 
 /*
 io.on('connection', (socket) => {
-
-  socket.on('add user', (data) => {
-    winston.info(`User: ${data.user}, ${socket.id}`);
-    users.push({
-      user: data.user,
-      id: socket.id
-    });
-    socket.emit('login', data);
-    socket.broadcast.emit('usersList', users);
-  });
-
-  socket.on('new message', (data) => {
-    io.to(data.to).emit('new message', {
-      username: data.username,
-      message: data.message
-    });
-  });
-  
-
-  
   socket.on('callFromTo', (data) =>{
     users.forEach(element => {
       if (element.user == data.callTO) {
@@ -46,12 +26,6 @@ io.on('connection', (socket) => {
 
   socket.on('stream', (data) => {
     io.emit('frameStream',data);
-  });
-
-  socket.on('disconnect', () => {
-    users.splice(users.indexOf(socket.id), 1);
-    socket.broadcast.emit('usersList', users);
-    winston.info(users);
   });
 });
 */
