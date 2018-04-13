@@ -3,9 +3,7 @@ Backend y Frontend para un servidor de webChat con videollamada.
 
 Necesita de:
 * nodeJS
-* Express
-* Socket.io
-* Winston
+* MongoDB
 
 **SETUP**
 
