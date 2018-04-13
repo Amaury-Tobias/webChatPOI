@@ -6,7 +6,6 @@ Necesita de:
 * Express
 * Socket.io
 * Winston
-* Mongoose
 
 **SETUP**
 
@@ -20,7 +19,7 @@ npm start
 **TODO**
 
 * Video llamada WebRTC (primer soporte de video ya en codigo pero deshabilitado).
-* Hoja de estilo CSS (completa). 
+* Hoja de estilo CSS (completa).
 * Login de usuarios.
 * MongoDB (storage)).
 
