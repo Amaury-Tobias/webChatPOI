@@ -9,6 +9,7 @@ $(function () {
 
   var $window = $(window);
   var $usernameInput = $('.usernameInput');
+  var $passwordInput = $('.passwordInput');
   var $messages = $('.messages');
   var $inputMessage = $('.inputMessage');
   var $inputMessageU = $('.inputMessageU');
@@ -20,8 +21,9 @@ $(function () {
   var $chatPage = $('.chat.page');
 
   var username;
+  var password;
   var typing = false;
-  var $currentInput = $usernameInput.focus();
+  //var $currentInput = $usernameInput.focus();
 
   var currentChat;
 
@@ -29,17 +31,26 @@ $(function () {
 
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
-    
-    if (username) {      
+    password = cleanInput($passwordInput.val().trim());
+
+    if (username && password) {      
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
-      $currentInput = $inputMessage.focus();
+      //$currentInput = $inputMessage.focus();
+      
+      $.ajax({
+        method: 'POST',
+        headers: {
+          'Authorization':'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbWF1cnlAbWFpbC5jb20iLCJpYXQiOjE1MjM1NjAxNTMsImV4cCI6MTUyNDc2OTc1M30.iYFBeZ8ng6RUwpOV4TIUEm51gzwEyz_n3uMkYNwWs0k'
+        },
+        url: '/api/signin'
+      })
 
-      // Tell the server your username
       socket.emit('add user', {
         user: username
       });
+      
     }
   }
   function cleanInput (input) {
@@ -103,12 +114,7 @@ $(function () {
     return COLORS[index];
   }
   function addChatMessage (data, options) {
-    //var $typingMessages = getTypingMessages(data);
     options = options || {};
-    /*if ($typingMessages.length !== 0) {
-      options.fade = false;
-      $typingMessages.remove();
-    }*/
 
     var $usernameDiv = $('<span class="username"/>')
     .text(data.username)
@@ -116,10 +122,8 @@ $(function () {
     var $messageBodyDiv = $('<span class="messageBody">')
     .text(data.message);
 
-    var typingClass = data.typing ? 'typing' : '';
     var $messageDiv = $('<li class="message"/>')
     .data('username', data.username)
-    .addClass(typingClass)
     .append($usernameDiv, $messageBodyDiv);
 
     addMessageElement($messageDiv, options);
@@ -128,21 +132,13 @@ $(function () {
 
   // Element Events
   $window.keydown( function (event) {
-    if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
-    }
     if (event.which === 13) {
       if (username) {
         sendMessage();
-        socket.emit('stop typing');
-        typing = false;
       } else {
         setUsername();
       }
     }
-  });
-  $loginPage.click( function () {
-    $currentInput.focus();
   });
   $inputMessage.click( function () {
     $inputMessage.focus();
@@ -153,15 +149,15 @@ $(function () {
 
   socket.on('usersList', function (data) {
     $contactList.html("");
-    console.log(data);
+
     data.forEach(element => {
       if (element.user != username) {
         var $contactName = $('<p class="contactName" />')
         .text(element.user);
   
         var $contactImage = $('<img class="contactImage" />')
-        .attr('src', "asd.jpg");
-  
+        .attr('src', "profilePictures/6a7abe0bddbbcd7c64ff244240d1edfd");
+        //^^^attr src `profilePictures/${element.picture}`
         var $newContact = $('<li />')
         .addClass('contact')
         .attr('id', element.id)

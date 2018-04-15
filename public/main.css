@@ -98,7 +98,7 @@ ul {
   top: 50%;
   width: 100%;
 }
-.login.page .form .usernameInput {
+.login.page .form .usernameInput, .login.page .passwordInput {
   background-color: transparent;
   border: none;
   border-bottom: 2px solid #128c7e;
@@ -110,11 +110,11 @@ ul {
 .login.page .title {
   font-size: 200%;
 }
-.login.page .usernameInput {
+.login.page .usernameInput, .login.page .passwordInput {
   font-size: 200%;
   letter-spacing: 3px;
 }
-.login.page .title, .login.page .usernameInput {
+.login.page .title, .login.page .usernameInput, .login.page .passwordInput {
   color: #000;
   font-weight: 100;
 }

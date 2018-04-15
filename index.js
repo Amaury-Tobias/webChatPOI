@@ -11,23 +11,23 @@ const config = require('./config')
 
 var users = []
 
-appSocket(io, users);
+appSocket(io, users)
 
 /*
-io.on('connection', (socket) => {
-  socket.on('callFromTo', (data) =>{
-    users.forEach(element => {
-      if (element.user == data.callTO) {
-        winston.info(`Call from ${data.callFrom} \nto ${element.id}`);
-        io.to(element.id).emit('NewCall', data);
-      }
+  io.on('connection', (socket) => {
+    socket.on('callFromTo', (data) =>{
+      users.forEach(element => {
+        if (element.user == data.callTO) {
+          winston.info(`Call from ${data.callFrom} \nto ${element.id}`);
+          io.to(element.id).emit('NewCall', data);
+        }
+      });
+    });
+
+    socket.on('stream', (data) => {
+      io.emit('frameStream',data);
     });
   });
-
-  socket.on('stream', (data) => {
-    io.emit('frameStream',data);
-  });
-});
 */
 
 

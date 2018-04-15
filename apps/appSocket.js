@@ -1,15 +1,16 @@
 'use strict'
-const winston = require('winston')
 
-module.exports = function (io, users) {
+var apiSocket = function (io, users) {
+    
     io.on('connection', (socket) => {
         socket.on('add user', (data) => {
-            winston.info(`newUser: ${data.user}, ${socket.id}`);
+            //Buscar el data.user en la base de datos para tener su imagen de perfil
+            //agregar picture: (resultado de la base de datos) al usuario
             users.push({
                 user: data.user,
-                id: socket.id
+                id: socket.id,
               })
-              io.sockets.emit('usersList', users);
+              io.sockets.emit('usersList', users)
         })
 
         socket.on('new message', (data) => {
@@ -26,8 +27,11 @@ module.exports = function (io, users) {
             leftUser = users.indexOf(leftUser)
             if (leftUser != -1) {
                 users.splice(leftUser, 1)
-                io.sockets.emit('usersList', users);
+                io.sockets.emit('usersList', users)
             }
         })
+
     })
 }
+
+module.exports = apiSocket

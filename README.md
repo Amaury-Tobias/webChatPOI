@@ -3,10 +3,7 @@ Backend y Frontend para un servidor de webChat con videollamada.
 
 Necesita de:
 * nodeJS
-* Express
-* Socket.io
-* Winston
-* Mongoose
+* mongoDB
 
 **SETUP**
 
@@ -19,7 +16,7 @@ npm start
 
 **TODO**
 
-* Video llamada WebRTC (primer soporte de video ya en codigo pero deshabilitado).
+* Video llamada por Socket (primer soporte de video ya en codigo pero deshabilitado).
 * Hoja de estilo CSS (completa). 
 * Login de usuarios.
 * MongoDB (storage)).
