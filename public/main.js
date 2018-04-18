@@ -33,7 +33,8 @@ $(function () {
   var username = localStorage.getItem('username');
   var estado = localStorage.getItem('estado');
   var password;
-  var typing = false;
+
+  var beep = new Audio('beep.mp3');
   //var $currentInput = $usernameInput.focus();
 
   var currentChat;
@@ -56,6 +57,7 @@ $(function () {
     console.log(data.status);
   })
 
+  Notification.requestPermission();
 
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
@@ -149,6 +151,9 @@ $(function () {
   }
 
   // Element Events
+  $window.click( function () {
+    $title.text(`FUSUFUM CHAT`);
+  })
   $window.keydown( function (event) {
     if (event.which === 13) {
       if (username) {
@@ -176,7 +181,6 @@ $(function () {
       });
     }
   });
-
   $contactList.on("click", ".contact", function () {
     currentChat = $(this).attr('id');
     if (currentChat == 'settings') {
@@ -225,9 +229,14 @@ $(function () {
         var $contactName = $('<p class="contactName" />')
         .text(`${element.user} (${element.estado})`);
   
-        var $contactImage = $('<img class="contactImage" />')
-        .attr('src', `profilePictures/${element.picture}`);
-        //^^^attr src `profilePictures/${element.picture}`
+        if (typeof(element.picture == 'undefined')) {
+          var $contactImage = $('<img class="contactImage" />')
+          .attr('src', `profilePictures/default.png`);
+        } else {
+          var $contactImage = $('<img class="contactImage" />')
+          .attr('src', `profilePictures/${element.picture}`);
+        }
+
         var $newContact = $('<li />')
         .addClass('contact')
         .attr('id', element.id)
@@ -240,7 +249,15 @@ $(function () {
   socket.on('new message', (data) => {
     addChatMessage(data);
     $title.text(`Nuevo mensaje de ${data.username}`);
+    new Notification(`${data.username} dice:`,{
+      body: `${data.message}`
+    });
+    beep.play();
   });
+
+  socket.on('beep', () => {
+    
+  })
 
   socket.on('reconnect', () => {    
     log('Reconectado');
