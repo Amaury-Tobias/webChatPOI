@@ -2,28 +2,40 @@
 
 const service = require('../services')
 
-function signUp (req, res) {
-    //DEberia ser con mongoose (internamente debe manejar la contraseña)
-    let user = {
-        username: req.body.username,
+function signUp (req, res) {    
+    //Deberia ser con mongoose (internamente debe manejar la contraseña)
+    if (typeof(req.body.username) != 'undefined') {
+        let user = {
+            username: req.body.username,
+        }
+        return res.status(200).cookie('jwtUser', service.createToken(user), {expire : new Date() + 9999}).send({ 
+            message: '[OK] signUp',
+            token: service.createToken(user) 
+        })
+    } else {
+        return res.status(300).send({
+            message: '[FAIL]'
+        })
     }
-
-    return res.status(200).send({ 
-        message: 'signUped',
-        token: service.createToken(user) 
-    })
 }
 
 function signIn(req, res) {
     //busca en la base DB
-    let user = {
-        username: req.body.username,
+    
+    if (typeof(req.body.username) != 'undefined') {
+        let user = {
+            username: req.body.username,
+        }
+        return res.status(200).cookie('jwtUser', service.createToken(user), {expire : new Date() + 9999}).send({
+            message: '[OK] signIn',
+            token: service.createToken(user)
+        })
+    } else {
+        
     }
 
-    return res.status(200).send({
-        message: 'Te has logeado',
-        token: service.createToken(user)
-    })
+
+
 }
 
 module.exports = {

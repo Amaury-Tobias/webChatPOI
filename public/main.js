@@ -7,12 +7,17 @@ $(function () {
   '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
+
+  var allMessages = [{
+    chattingWith: "all"
+  }]
+
+
   var $window = $(window);
   var $usernameInput = $('.usernameInput');
   var $passwordInput = $('.passwordInput');
   var $messages = $('.messages');
   var $inputMessage = $('.inputMessage');
-  var $inputMessageU = $('.inputMessageU');
   var $title = $('#title');
   var $contactList = $('.contactList')
   var $contact = $('.contact');
@@ -20,35 +25,58 @@ $(function () {
   var $loginPage = $('.login.page');
   var $chatPage = $('.chat.page');
 
-  var username;
+  var $settingsPage = $('.settings.page');
+  var $estadoInput = $('.estadoInput');
+
+  var $closeSession = $('#closeSession');
+
+  var username = localStorage.getItem('username');
+  var estado = localStorage.getItem('estado');
   var password;
   var typing = false;
   //var $currentInput = $usernameInput.focus();
 
   var currentChat;
-
   var socket = io();
+
+  $.post('/api/signin', {username: username})
+  .done( data => {
+    $usernameInput.val = username;
+
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+
+    socket.emit('add user', {
+      user: username,
+      estado: estado
+    });
+  })
+  .fail( data => {
+    console.log(data.status);
+  })
+
 
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
     password = cleanInput($passwordInput.val().trim());
-
+    localStorage.setItem('username', username)
     if (username && password) {      
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
-      //$currentInput = $inputMessage.focus();
-      
-      $.ajax({
-        method: 'POST',
-        headers: {
-          'Authorization':'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbWF1cnlAbWFpbC5jb20iLCJpYXQiOjE1MjM1NjAxNTMsImV4cCI6MTUyNDc2OTc1M30.iYFBeZ8ng6RUwpOV4TIUEm51gzwEyz_n3uMkYNwWs0k'
-        },
-        url: '/api/signin'
+
+      $.post('/api/signup', {username: username})
+      .done( data => {
+        console.log(data);
+      })
+      .fail( data => {
+        console.log(data.status);
       })
 
       socket.emit('add user', {
-        user: username
+        user: username,
+        estado: estado
       });
       
     }
@@ -58,21 +86,14 @@ $(function () {
   }
   function log (message, options) {
     var $el = $('<li>').addClass('log').text(message);
-    addMessageElement($el, options);
+    addMessageElement($el);
   }
-  function addMessageElement (el, options) {
+  function addMessageElement (el) {
     var $el = $(el);
 
-    // Setup default options
-    if (!options) {
-      options = {};
-    }
-    if (typeof options.fade === 'undefined') {
-      options.fade = true;
-    }
-    if (typeof options.prepend === 'undefined') {
-      options.prepend = false;
-    }
+    let  options = {};
+    options.fade = true;
+    options.prepend = false;
 
     // Apply options
     if (options.fade) {
@@ -113,11 +134,9 @@ $(function () {
     var index = Math.abs(hash % COLORS.length);
     return COLORS[index];
   }
-  function addChatMessage (data, options) {
-    options = options || {};
-
+  function addChatMessage (data) {
     var $usernameDiv = $('<span class="username"/>')
-    .text(data.username)
+    .text(`${data.username}: `)
     .css('color', getUsernameColor(data.username));
     var $messageBodyDiv = $('<span class="messageBody">')
     .text(data.message);
@@ -126,9 +145,8 @@ $(function () {
     .data('username', data.username)
     .append($usernameDiv, $messageBodyDiv);
 
-    addMessageElement($messageDiv, options);
+    addMessageElement($messageDiv);
   }
-
 
   // Element Events
   $window.keydown( function (event) {
@@ -143,20 +161,72 @@ $(function () {
   $inputMessage.click( function () {
     $inputMessage.focus();
   });
-  $contactList.on("click", ".contact", function () {
-    currentChat = $(this).attr('id');
+  $estadoInput.click( function () {
+    $estadoInput.focus();
+  });
+  $estadoInput.keydown( function (event) {
+    if (event.which === 13) {
+      localStorage.setItem('estado', $estadoInput.val());
+      estado = $estadoInput.val();
+      $chatPage.fadeIn();
+      $settingsPage.fadeOut();
+      socket.emit('add user', {
+        user: username,
+        estado: estado
+      });
+    }
   });
 
-  socket.on('usersList', function (data) {
-    $contactList.html("");
+  $contactList.on("click", ".contact", function () {
+    currentChat = $(this).attr('id');
+    if (currentChat == 'settings') {
+      estado = localStorage.getItem('estado')
+      $chatPage.fadeOut();
+      $settingsPage.fadeIn();
+      $estadoInput.val(estado);
+    } else if (currentChat == 'chatAll') {
+      socket.emit('print', 'print')
+    } else {
+      $chatPage.fadeIn();
+      $settingsPage.fadeOut();
+    }
+  });
+  $closeSession.on('click', function () {
+    localStorage.removeItem('username');
+    $.post('/api/signout')
+    .done( data => {
+      $loginPage.fadeIn();
+      $chatPage.fadeOut();
+      $loginPage.on('click');
+      $chatPage.off('click');
+      location.reload();
+    })
+    .fail( data => {
+      console.log(data.status);
+    })
+  })
 
+  socket.on('usersList', (data) => {
+    $contactList.html("");
+    $contactList.append(`
+    <li class="contact" id="settings">
+    <img src="profilePictures/settings.png" class="contactImage">
+    <p class="contactName">Settings</p>
+    </li>
+    `);
+    $contactList.append(`
+    <li class="contact" id="chatAll">
+    <img src="profilePictures/general.png" class="contactImage">
+    <p class="contactName">General (${data.length - 1})</p>
+    </li>
+    `);
     data.forEach(element => {
       if (element.user != username) {
         var $contactName = $('<p class="contactName" />')
-        .text(element.user);
+        .text(`${element.user} (${element.estado})`);
   
         var $contactImage = $('<img class="contactImage" />')
-        .attr('src', "profilePictures/6a7abe0bddbbcd7c64ff244240d1edfd");
+        .attr('src', `profilePictures/${element.picture}`);
         //^^^attr src `profilePictures/${element.picture}`
         var $newContact = $('<li />')
         .addClass('contact')
@@ -176,7 +246,8 @@ $(function () {
     log('Reconectado');
     if (username) {
       socket.emit('add user', {
-        user: username
+        user: username,
+        estado: estado
       });
     }
   });

@@ -5,7 +5,6 @@ html {
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
 }
-
 html, input {
   font-family:
     "HelveticaNeue-Light",
@@ -16,13 +15,11 @@ html, input {
     "Lucida Grande",
     sans-serif;
 }
-
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
 }
-
 ul {
   list-style: none;
   word-wrap: break-word;
@@ -34,7 +31,6 @@ ul {
   margin: 0;
   padding: 0;
 }
-
 .pages {
   height: 100%;
   margin: 0;
@@ -66,7 +62,6 @@ ul {
   cursor: pointer;
   transition-duration: 800ms;
 }
-
 .contact:hover {
   background-color: #51bdb0;
 }
@@ -75,7 +70,6 @@ ul {
   width: 25%;
   border-radius: 50%;
 }
-
 .contactName {
   position: absolute;
   margin: 0 0 0 0.5em;
@@ -85,7 +79,6 @@ ul {
 }
 
 /* Login Page */
-
 .login.page {
   background-color: #fff;
 }
@@ -98,7 +91,7 @@ ul {
   top: 50%;
   width: 100%;
 }
-.login.page .form .usernameInput, .login.page .passwordInput {
+.login.page .form .usernameInput, .login.page .passwordInput, .estadoInput {
   background-color: transparent;
   border: none;
   border-bottom: 2px solid #128c7e;
@@ -110,22 +103,30 @@ ul {
 .login.page .title {
   font-size: 200%;
 }
-.login.page .usernameInput, .login.page .passwordInput {
+.login.page .usernameInput, .login.page .passwordInput, .estadoInput {
   font-size: 200%;
   letter-spacing: 3px;
 }
-.login.page .title, .login.page .usernameInput, .login.page .passwordInput {
+.login.page .title, .login.page .usernameInput, .login.page .passwordInput, .estadoInput {
   color: #000;
   font-weight: 100;
 }
 /* Chat page */
-
 .chat.page {
   display: none;
 }
 
-/* Font */
+/* Settings Page */
+.settings.page {
+  display: none;
+}
 
+/* Video Page */
+.video.page {
+  display: none;
+}
+
+/* Font */
 .messages {
   font-size: 150%;
 }

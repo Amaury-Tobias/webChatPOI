@@ -3,11 +3,11 @@
 const services = require('../services')
 
 function isAuth (req, res, next) {
-    if (!req.headers.authorization) {
+    if (!req.cookies.jwtUser) {
         return res.status(403).send({ message: 'No tienes autorizacion' })
     }
 
-    let token = req.headers.authorization.split(" ")[1]
+    let token = req.cookies.jwtUser
 
     services.decodeToken(token)
         .then(response => {

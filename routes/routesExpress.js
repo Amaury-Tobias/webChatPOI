@@ -26,6 +26,11 @@ api.get('/private', auth, (req, res) => {
 
 api.post('/signup', userCtl.signUp)
 api.post('/signin', auth, userCtl.signIn)
+api.post('/signout', auth, (req, res) => {
+    res.status(200).clearCookie('jwtUser', { path: '/' }).send({
+        message: 'signedOut'
+    })
+})
 
 
 api.post('/upload', upload.single('avatar'), (req, res) => {

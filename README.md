@@ -8,7 +8,6 @@ Necesita de:
 **SETUP**
 
 ```[javascript]
-//En el main folder
 npm install
 npm start
 ```
