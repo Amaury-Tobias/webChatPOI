@@ -1,14 +1,12 @@
 'use strict'
 
 var apiSocket = function (io, users) {
-    
     io.on('connection', (socket) => {
         io.to(socket.id).emit('test', '200 OK')
 
         socket.on('add user', (data) => {
             //Buscar el data.user en la base de datos para tener su imagen de perfil
             //agregar picture: (resultado de la base de datos) al usuario
-            
             if (users.length === 0) {
                 users.push({
                     user: data.user,
@@ -39,10 +37,17 @@ var apiSocket = function (io, users) {
         })
 
         socket.on('new message', (data) => {
-            io.to(data.to).emit('new message', {
-            username: data.username,
-            message: data.message
-            })
+            if (data.to === 'chatAll') {
+                socket.broadcast.emit('new message', {
+                   username: data.username,
+                   message: data.message
+               })
+            } else {
+                io.to(data.to).emit('new message', {
+                    username: data.username,
+                    message: data.message
+                })
+            }
         })
 
         socket.on('disconnect', () => {

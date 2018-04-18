@@ -62,6 +62,12 @@ ul {
   cursor: pointer;
   transition-duration: 800ms;
 }
+.activeContact {
+  background-color: #fff;
+}
+.newMessageContact {
+  background-color: orange;
+}
 .contact:hover {
   background-color: #51bdb0;
 }
@@ -158,6 +164,10 @@ ul {
 
 .message.typing .messageBody {
   color: gray;
+}
+
+.message {
+  border-color: #128c7e;
 }
 
 .username {

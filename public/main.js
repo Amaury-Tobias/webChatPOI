@@ -1,3 +1,5 @@
+'use strict';
+
 $(function () {
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
@@ -10,8 +12,7 @@ $(function () {
 
   var allMessages = [{
     chattingWith: "all"
-  }]
-
+  }];
 
   var $window = $(window);
   var $usernameInput = $('.usernameInput');
@@ -19,7 +20,7 @@ $(function () {
   var $messages = $('.messages');
   var $inputMessage = $('.inputMessage');
   var $title = $('#title');
-  var $contactList = $('.contactList')
+  var $contactList = $('.contactList');
   var $contact = $('.contact');
 
   var $loginPage = $('.login.page');
@@ -41,7 +42,7 @@ $(function () {
   var socket = io();
 
   $.post('/api/signin', {username: username})
-  .done( data => {
+  .done( (data) => {
     $usernameInput.val = username;
 
     $loginPage.fadeOut();
@@ -53,34 +54,35 @@ $(function () {
       estado: estado
     });
   })
-  .fail( data => {
+  .fail( (data) => {
+    localStorage.removeItem('username');
+    localStorage.removeItem('estado');
     console.log(data.status);
-  })
+  });
 
   Notification.requestPermission();
 
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
     password = cleanInput($passwordInput.val().trim());
-    localStorage.setItem('username', username)
-    if (username && password) {      
+    localStorage.setItem('username', username);
+    if (username && password) {
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
 
       $.post('/api/signup', {username: username})
-      .done( data => {
+      .done( (data) => {
         console.log(data);
       })
-      .fail( data => {
+      .fail( (data) => {
         console.log(data.status);
-      })
+      });
 
       socket.emit('add user', {
         user: username,
         estado: estado
       });
-      
     }
   }
   function cleanInput (input) {
@@ -93,14 +95,12 @@ $(function () {
   function addMessageElement (el) {
     var $el = $(el);
 
-    let  options = {};
+    var  options = {};
     options.fade = true;
     options.prepend = false;
 
     // Apply options
-    if (options.fade) {
-      $el.hide().fadeIn(FADE_TIME);
-    }
+    $el.hide().fadeIn(FADE_TIME);
     if (options.prepend) {
       $messages.prepend($el);
     } else {
@@ -109,10 +109,10 @@ $(function () {
     $messages[0].scrollTop = $messages[0].scrollHeight;
   }
   function sendMessage () {
-    var message = $inputMessage.val();    
+    var message = $inputMessage.val();
     message = cleanInput(message);
 
-    dataMessage = {
+    var dataMessage = {
       username: username,
       message: message,
       to: currentChat
@@ -121,17 +121,16 @@ $(function () {
       $inputMessage.val('');
       addChatMessage({
         username: username,
-        message: message,
+        message: message
       });
       socket.emit('new message', dataMessage);
     }
   }
   function getUsernameColor (username) {
-    // Compute hash code
     var hash = 7;
-    for (var i = 0; i < username.length; i++) {
-     hash = username.charCodeAt(i) + (hash << 5) - hash;
-   }
+    for (let i = 0; i < username.length; i++) {
+      hash = username.charCodeAt(i) + (hash <<5) - hash;
+    }
     // Calculate color
     var index = Math.abs(hash % COLORS.length);
     return COLORS[index];
@@ -153,6 +152,11 @@ $(function () {
   // Element Events
   $window.click( function () {
     $title.text(`FUSUFUM CHAT`);
+
+    $('.contactList .contact').each(function () {
+        $(this).removeClass('newMessageContact');
+    });
+
   })
   $window.keydown( function (event) {
     if (event.which === 13) {
@@ -183,13 +187,21 @@ $(function () {
   });
   $contactList.on("click", ".contact", function () {
     currentChat = $(this).attr('id');
+    $('.contactList .contact').each(function () {
+      $(this).removeClass('activeContact');
+    });
+
+    $(this).addClass('activeContact');
+
     if (currentChat == 'settings') {
       estado = localStorage.getItem('estado')
       $chatPage.fadeOut();
       $settingsPage.fadeIn();
       $estadoInput.val(estado);
     } else if (currentChat == 'chatAll') {
-      socket.emit('print', 'print')
+      socket.emit('print', 'print');
+      $chatPage.fadeIn();
+      $settingsPage.fadeOut();
     } else {
       $chatPage.fadeIn();
       $settingsPage.fadeOut();
@@ -206,7 +218,6 @@ $(function () {
       location.reload();
     })
     .fail( data => {
-      console.log(data.status);
     })
   })
 
@@ -228,7 +239,6 @@ $(function () {
       if (element.user != username) {
         var $contactName = $('<p class="contactName" />')
         .text(`${element.user} (${element.estado})`);
-  
         if (typeof(element.picture == 'undefined')) {
           var $contactImage = $('<img class="contactImage" />')
           .attr('src', `profilePictures/default.png`);
@@ -240,6 +250,7 @@ $(function () {
         var $newContact = $('<li />')
         .addClass('contact')
         .attr('id', element.id)
+        .attr('username', element.user)
         .append($contactImage, $contactName);
         $contactList.append($newContact);
       }
@@ -253,13 +264,15 @@ $(function () {
       body: `${data.message}`
     });
     beep.play();
+    $('.contactList .contact').each(function () {
+      var newMessageUsername = $(this).attr('username');
+      if (newMessageUsername == data.username) {
+        $(this).addClass('newMessageContact');
+      }
+    });
   });
 
-  socket.on('beep', () => {
-    
-  })
-
-  socket.on('reconnect', () => {    
+  socket.on('reconnect', () => {
     log('Reconectado');
     if (username) {
       socket.emit('add user', {
