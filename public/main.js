@@ -47,6 +47,7 @@ $(function () {
 
     $loginPage.fadeOut();
     $chatPage.show();
+    $chatPage.css("display", "grid");
     $loginPage.off('click');
 
     socket.emit('add user', {
@@ -69,6 +70,7 @@ $(function () {
     if (username && password) {
       $loginPage.fadeOut();
       $chatPage.show();
+      $chatPage.css("display", "grid");
       $loginPage.off('click');
 
       $.post('/api/signup', {username: username})
@@ -190,9 +192,7 @@ $(function () {
     $('.contactList .contact').each(function () {
       $(this).removeClass('activeContact');
     });
-
     $(this).addClass('activeContact');
-
     if (currentChat == 'settings') {
       estado = localStorage.getItem('estado')
       $chatPage.fadeOut();

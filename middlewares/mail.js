@@ -8,7 +8,7 @@ function createTransport (fromUser, passUser) {
     return new Promise ((resolve, reject) => {
         try {
             let smtpTransport = nodemailer.config({
-                host: "smtp.gmail.com",            
+                host: "smtp.gmail.com",
                 auth: {
                     user: fromUser,
                     pass: passUser
