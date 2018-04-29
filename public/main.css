@@ -27,13 +27,14 @@ ul {
   display: grid;
   width: 100%;
   height: 100%;
-  grid-template-columns: 200px 1fr 1fr;
+  grid-template-columns: 200px 1fr;
   grid-template-rows: 50px 1fr;
   grid-template-areas:
-      "header header header"
-      "sidebar content-1 content-1";
+      "header header"
+      "sidebar content-1";
 }
 .pages {
+  overflow: scroll;
   grid-area: content-1;
   margin: 0;
   padding: 0;
@@ -64,6 +65,9 @@ ul {
   z-index: 3;
 }
 /* Contacts List */
+#listContainer{
+  overflow: scroll;
+}
 .contactList {
   grid-area: sidebar;
   margin: 0;

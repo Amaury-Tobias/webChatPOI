@@ -2,6 +2,8 @@
 
 var apiSocket = function (io, users) {
     io.on('connection', (socket) => {
+        console.log("conectado");
+        
         io.to(socket.id).emit('test', '200 OK')
 
         socket.on('add user', (data) => {
