@@ -21,17 +21,29 @@
   <div class="mainGrid">
 
       <div class="login page">
-          <div class="form">
-            <h3 class="title">Login</h3>
+
+        <div class="formIn">
+            <h3 class="title">SignIn</h3>
             <input class="usernameInput" type="text" maxlength="14" placeholder="usuario" />
             <input class="passwordInput" maxlength="14" minlength="8" type="password" placeholder="contraseña" />
-          </div>
         </div>
+        
+        <div class='formUP'>
+            <form action="api/signup" method="post" enctype="multipart/form-data">
+              <h3 class="title">SignUP</h3>
+              <input class="usernameInput" type="text" name="username" placeholder="Username" />
+              <input class="passwordInput" type="password" name="password" placeholder="Password" />
+              <input type="file" name="avatar" accept=".jpg, .jpeg, .png">
+              <input type="submit" />
+          </form>
+        </div>
+
+      </div>
 
     <ul id="topBar">
       <li><img src="profilePictures/general.png" class="userImage" ></li>
       <li id="UserNameTopBar">UserName</li>
-      <li id="closeSession">🙂</li>
+      <li id="closeSession">Cerrar Sesion</li>
     </ul>
 
     <div id="listContainer">
@@ -69,6 +81,7 @@
       </li>
 
     </ul>
+
   </div>
 
   <script src="main.js"></script>
