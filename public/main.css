@@ -61,6 +61,7 @@ ul {
 .userImage {
   position: relative;
   height: 60px;
+  width: 60px;
   border-radius: 50%;
   z-index: 3;
 }
@@ -97,7 +98,8 @@ ul {
 }
 .contactImage {
   position: relative;
-  max-width: 25%;
+  height: 45px;
+  width: 45px;
   border-radius: 50%;
 }
 .contactName {
@@ -157,7 +159,7 @@ ul {
 
 /* Video Page */
 .video.page {
-  display: none;
+  /*display: none;*/
 }
 
 /* Font */

@@ -31,14 +31,14 @@ appSocket(io, users)
 */
 
 
-/*
+
 mongoose.connect(config.db, (err, res) => {
   if (err) {
-    return winston.info(`Error DB connection ${err}`)
+    return console.log(`Error DB connection ${err}`)
   }
-  winston.info('Connected to DB')
+  console.log('Connected to DB')
 })
-*/
+
 
 server.listen(config.port, () => {
   console.log(`Servidor corriendo en http://localhost:${config.port}`)

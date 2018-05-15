@@ -6,15 +6,22 @@
   <link rel="shortcut icon" href="3.png" type="image/png">
   <script src="/socket.io/socket.io.js"></script>
   <script src="jquery.js"></script>
-  <script src="main.js"></script>
   <link rel="stylesheet" href="main.css">
+
+  <script language="JavaScript" type="text/javascript" src="crypt/jsbn.js"></script>
+  <script language="JavaScript" type="text/javascript" src="crypt/random.js"></script>
+  <script language="JavaScript" type="text/javascript" src="crypt/hash.js"></script>
+  <script language="JavaScript" type="text/javascript" src="crypt/rsa.js"></script>
+  <script language="JavaScript" type="text/javascript" src="crypt/aes.js"></script>
+  <script language="JavaScript" type="text/javascript" src="crypt/api.js"></script>
+  <script language="JavaScript" type="text/javascript" src="crypto.js"></script>
 </head>
 <body>
 
   <div class="mainGrid">
     <ul id="topBar">
       <li><img src="profilePictures/general.png" class="userImage" ></li>
-      <li>UserName</li>
+      <li id="UserNameTopBar">UserName</li>
       <li id="closeSession">🙂</li>
     </ul>
 
@@ -43,32 +50,30 @@
             <input class="passwordInput" maxlength="14" minlength="8" type="password" placeholder="contraseña" />
           </div>
       </li>
-
       <li class="settings page">
         <div class="form">
           <input type="text" class="estadoInput" placeholder="Estado...">
         </div>
       </li>
 
-      <!--<li class="video page">-->
-
+      <li class="video page">
+        <div class="camerasContainer">
+          <ul class="cameras">
+              <video autoplay playsinline id="localVideo"></video>
+            <li>
+            </li>
+          </ul>
+        </div>
       </li>
 
     </ul>
   </div>
 
+  <script src="main.js"></script>
 <!-- 
-  <h2 id="myName"></h2>
-  <div id="messages"></div>
-  <br/>
-  <form onsubmit="return addMessage(this)">
-    <input type="submit" value="Enviar!">
-  </form>
-
   <input type="button" value="Call" id="callButton" onclick="callFunction()">
   <input type="button" value="Answer" id="answerButton" onclick="answerFunction()">
 
-  <video id="video" width="240px"></video>
   <div id="callsContainer"></div>
   <img id="reciver" width="240px"></img>
    -->

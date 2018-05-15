@@ -1,157 +1,221 @@
-'use strict';
+'use strict'
 
-$(function () {
-  var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
-  var COLORS = [
+var MyKey;
+var MyPKey;
+
+var allChat = [{
+  username: 'chatAll',
+  messages: [
+    {sender: 'server', message: "Bienvenido"}
+  ]}]
+
+var FADE_TIME = 150
+var COLORS = [
   '#e21400', '#91580f', '#f8a700', '#f78b00',
   '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
   '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
-  ];
+]
 
+  //VideoLlamada
+var canvas = document.createElement('canvas')
+var context = canvas.getContext('2d')
+context.width = 120
+context.height = 120
+var $localVideo = $('#localVideo')
+navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+  .then((stream) => {
+      document.getElementById('localVideo').srcObject = stream;
+  })
+  .catch((err) => {
+  })
 
-  var allMessages = [{
-    chattingWith: "all"
-  }];
+var $window = $(window)
+var $usernameInput = $('.usernameInput')
+var $passwordInput = $('.passwordInput')
+var $messages = $('.messages')
+var $inputMessage = $('.inputMessage')
+var $title = $('#title')
+var $contactList = $('.contactList')
+var $contact = $('.contact')
 
-  var $window = $(window);
-  var $usernameInput = $('.usernameInput');
-  var $passwordInput = $('.passwordInput');
-  var $messages = $('.messages');
-  var $inputMessage = $('.inputMessage');
-  var $title = $('#title');
-  var $contactList = $('.contactList');
-  var $contact = $('.contact');
+//Pages
+var $loginPage = $('.login.page')
+var $chatPage = $('.chat.page')
+var $settingsPage = $('.settings.page')
+var $estadoInput = $('.estadoInput')
+var $closeSession = $('#closeSession')
+var $usernameTopbar = $('#UserNameTopBar')
+var $userImage = $('.userImage')
 
-  var $loginPage = $('.login.page');
-  var $chatPage = $('.chat.page');
+var username
+var estado
+var password
+var beep = new Audio('beep.mp3');
+var currentChat;
+var currentKey;
+var socket = io();
 
-  var $settingsPage = $('.settings.page');
-  var $estadoInput = $('.estadoInput');
-
-  var $closeSession = $('#closeSession');
-
-  var username = localStorage.getItem('username');
-  var estado = localStorage.getItem('estado');
-  var password;
-
-  var beep = new Audio('beep.mp3');
-  //var $currentInput = $usernameInput.focus();
-
-  var currentChat;
-  var socket = io();
-
-  $.post('/api/signin', {username: username})
+$(function () {
+  username = localStorage.getItem('username')
+  estado = localStorage.getItem('estado')
+    
+  $.post('api/signin')
   .done( (data) => {
-    $usernameInput.val = username;
+    console.log(data);
+    
+    localStorage.setItem('username', data.dataUser[0].username)
+    username = data.dataUser[0].username
 
-    $loginPage.fadeOut();
-    $chatPage.show();
-    $chatPage.css("display", "grid");
-    $loginPage.off('click');
+    $loginPage.fadeOut()
+    $chatPage.show()
+    $chatPage.css("display", "grid")
+    $loginPage.off('click')
+    $usernameTopbar.text(username)
+    $userImage.attr('src', `profilePictures/${data.dataUser[0].avatar}`)
 
+    MyPKey = genKeyRSA(username).MyPKey
+    MyKey = genKeyRSA(username).MyKey
     socket.emit('add user', {
       user: username,
-      estado: estado
-    });
+      estado: estado,
+      key: MyPKey
+    })
   })
   .fail( (data) => {
-    localStorage.removeItem('username');
-    localStorage.removeItem('estado');
-    console.log(data.status);
-  });
+    localStorage.removeItem('username')
+    localStorage.removeItem('estado')    
+    //$(location).attr('href', 'http://localhost:8080/api/registrar')
+  })
+})
 
-  Notification.requestPermission();
+Notification.requestPermission();
 
-  function setUsername () {
-    username = cleanInput($usernameInput.val().trim());
-    password = cleanInput($passwordInput.val().trim());
-    localStorage.setItem('username', username);
-    if (username && password) {
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $chatPage.css("display", "grid");
-      $loginPage.off('click');
+function setUsername () {
+  username = cleanInput($usernameInput.val().trim())
+  password = cleanInput($passwordInput.val().trim())
+  
+  if (username && password) {
+    $.post('/api/signin', {username: username, password: password, session: '0'})
+    .done( (data) => {
+      $loginPage.fadeOut()
+      $chatPage.show()
+      $chatPage.css("display", "grid")
+      $loginPage.off('click')
+      $usernameTopbar.text(data.dataUser[0].username)
+      $userImage.attr('src', `profilePictures/${data.dataUser[0].avatar}`)
+      localStorage.setItem('username', data.dataUser[0].username)
 
-      $.post('/api/signup', {username: username})
-      .done( (data) => {
-        console.log(data);
-      })
-      .fail( (data) => {
-        console.log(data.status);
-      });
+      MyPKey = genKeyRSA(username).MyPKey
+      MyKey = genKeyRSA(username).MyKey
 
       socket.emit('add user', {
-        user: username,
-        estado: estado
-      });
-    }
-  }
-  function cleanInput (input) {
-    return $('<div/>').text(input).text();
-  }
-  function log (message, options) {
-    var $el = $('<li>').addClass('log').text(message);
-    addMessageElement($el);
-  }
-  function addMessageElement (el) {
-    var $el = $(el);
+        user: data.dataUser[0].username,
+        estado: estado,
+        key: MyPKey
+      })
+    })
+    .fail( (data) => {
+      $usernameInput.val("error de login")
+    })
 
-    var  options = {};
-    options.fade = true;
-    options.prepend = false;
+  }
+}
+function cleanInput (input) {
+  return $('<div/>').text(input).text()
+}
+function log (message, options) {
+  var $el = $('<li>').addClass('log').text(message)
+  addMessageElement($el)
+}
+function addMessageElement (el) {
+  var $el = $(el)
+  $el.hide().fadeIn(FADE_TIME)
+  $messages.append($el)
+  $messages[0].scrollTop = $messages[0].scrollHeight
+}
+function sendMessage () {
+  var message = cleanInput($inputMessage.val().trim())
+  addChatMessage({ username: username, message: message })
 
-    // Apply options
-    $el.hide().fadeIn(FADE_TIME);
-    if (options.prepend) {
-      $messages.prepend($el);
+  message = cryptico.encrypt(message, currentKey, MyKey)
+  var dataMessage = {
+    username: username,
+    message: message,
+    to: currentChat
+  }
+  $inputMessage.val('')
+  socket.emit('new message', dataMessage)
+
+  allChat.forEach(element => {
+    if (element.username === dataMessage.to) {
+      element.messages.push({ sender: dataMessage.username, message: dataMessage.message })
     } else {
-      $messages.append($el);
+      let innerMessage = { sender: dataMessage.username, message: dataMessage.message }
+      let newChat = { username: dataMessage.to, messages: [] }
+      newChat.messages.push(innerMessage)
+      allChat.push(newChat)
     }
-    $messages[0].scrollTop = $messages[0].scrollHeight;
-  }
-  function sendMessage () {
-    var message = $inputMessage.val();
-    message = cleanInput(message);
+  })
+}
+function addChatMessage (data) {
+  var $messageDiv
 
-    var dataMessage = {
-      username: username,
-      message: message,
-      to: currentChat
-    };
-    if (message) {
-      $inputMessage.val('');
-      addChatMessage({
-        username: username,
-        message: message
-      });
-      socket.emit('new message', dataMessage);
-    }
-  }
-  function getUsernameColor (username) {
-    var hash = 7;
-    for (let i = 0; i < username.length; i++) {
-      hash = username.charCodeAt(i) + (hash <<5) - hash;
-    }
-    // Calculate color
-    var index = Math.abs(hash % COLORS.length);
-    return COLORS[index];
-  }
-  function addChatMessage (data) {
-    var $usernameDiv = $('<span class="username"/>')
-    .text(`${data.username}: `)
-    .css('color', getUsernameColor(data.username));
-    var $messageBodyDiv = $('<span class="messageBody">')
-    .text(data.message);
+  if (data.username === username) {
+    let $usernameDiv = $('<span class="username"/>')
+    .text(`Me: `)
+    .css('color', getUsernameColor(data.username))
 
-    var $messageDiv = $('<li class="message"/>')
+    let $messageBodyDiv = $('<span class="messageBody">')
+    .text(data.message)
+
+    $messageDiv = $('<li class="message"/>')
     .data('username', data.username)
-    .append($usernameDiv, $messageBodyDiv);
+    .append($usernameDiv, $messageBodyDiv).addClass('req')
 
-    addMessageElement($messageDiv);
+  } else {
+    let $usernameDiv = $('<span class="username"/>')
+    .text(`${data.username}: `)
+    .css('color', getUsernameColor(data.username))
+console.log(cryptico.decrypt(data.message.cipher, MyKey))
+    let $messageBodyDiv = $('<span class="messageBody">')
+    .text(cryptico.decrypt(data.message.cipher, MyKey).plaintext)
+
+    $messageDiv = $('<li class="message"/>')
+    .data('username', data.username)
+    .append($usernameDiv, $messageBodyDiv).addClass('res')
   }
+  addMessageElement($messageDiv)
+}
+
+function getUsernameColor (username) {
+  var hash = 7
+  for (let i = 0; i < username.length; i++) {
+    hash = username.charCodeAt(i) + (hash <<5) - hash
+  }
+  var index = Math.abs(hash % COLORS.length)
+  return COLORS[index]
+}
 
   // Element Events
+  $inputMessage.keydown (function (event) {
+    
+    var emojiMessage = $inputMessage.val()
+
+    var find = /:(cry):/
+    var RE = new RegExp(find, 'g')
+    emojiMessage = emojiMessage.replace(RE, '😭')
+
+    find = /:(happy):/
+    RE = new RegExp(find, 'g')
+    emojiMessage = emojiMessage.replace(RE, '😃')
+    
+    $inputMessage.val(emojiMessage)
+
+    if (event.which === 13) {
+      sendMessage();
+    }
+  });
+
   $window.click( function () {
     $title.text(`FUSUFUM CHAT`);
 
@@ -163,7 +227,7 @@ $(function () {
   $window.keydown( function (event) {
     if (event.which === 13) {
       if (username) {
-        sendMessage();
+        //sendMessage();
       } else {
         setUsername();
       }
@@ -183,12 +247,14 @@ $(function () {
       $settingsPage.fadeOut();
       socket.emit('add user', {
         user: username,
-        estado: estado
+        estado: estado,
+        key: MyPKey
       });
     }
   });
   $contactList.on("click", ".contact", function () {
     currentChat = $(this).attr('id');
+    currentKey = $(this).attr('key');
     $('.contactList .contact').each(function () {
       $(this).removeClass('activeContact');
     });
@@ -221,6 +287,8 @@ $(function () {
     })
   })
 
+
+
   socket.on('usersList', (data) => {
     $contactList.html("");
     $contactList.append(`
@@ -236,20 +304,20 @@ $(function () {
     </li>
     `);
     data.forEach(element => {
-      if (element.user != username) {
+      if (element.user != username) {        
         var $contactName = $('<p class="contactName" />')
         .text(`${element.user} (${element.estado})`);
-        if (typeof(element.picture == 'undefined')) {
+        if (typeof(element.avatar) == 'undefined') {
           var $contactImage = $('<img class="contactImage" />')
           .attr('src', `profilePictures/default.png`);
         } else {
           var $contactImage = $('<img class="contactImage" />')
-          .attr('src', `profilePictures/${element.picture}`);
+          .attr('src', `profilePictures/${element.avatar}`);
         }
-
         var $newContact = $('<li />')
         .addClass('contact')
         .attr('id', element.id)
+        .attr('key', `${element.key}`)
         .attr('username', element.user)
         .append($contactImage, $contactName);
         $contactList.append($newContact);
@@ -261,7 +329,7 @@ $(function () {
     addChatMessage(data);
     $title.text(`Nuevo mensaje de ${data.username}`);
     new Notification(`${data.username} dice:`,{
-      body: `${data.message}`
+      body: `${cryptico.decrypt(data.message.cipher, MyKey).plaintext}`
     });
     beep.play();
     $('.contactList .contact').each(function () {
@@ -277,7 +345,8 @@ $(function () {
     if (username) {
       socket.emit('add user', {
         user: username,
-        estado: estado
+        estado: estado,
+        key: MyPKey
       });
     }
   });
@@ -290,30 +359,21 @@ $(function () {
     log('Error en el intento de reconexión');
   });
 
-});
-
 
 /*
 var video;
 var img;
-var canvas = document.createElement('canvas');
-var context = canvas.getContext('2d');
+
 var answer = false;
-var constraints = {video: true, audio: true};
-context.width = 120;
-context.height = 120;
+
 
 
 document.addEventListener('DOMContentLoaded',function () {
   document.getElementById("answerButton").disabled = true;
-  document.getElementById("myName").innerHTML = user;
   video = document.getElementById("video");
   img = document.getElementById("reciver");
 
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
-    navigator.mediaDevices.getUserMedia({video:true}).then(success)
-  else
-    alert("Your browser does not support getUserMedia()");
+
 
     function success(stream) {
       video.src = window.URL.createObjectURL(stream);

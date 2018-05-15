@@ -1,0 +1,93 @@
+
+<html>
+
+    <head>
+
+        <script language="JavaScript" type="text/javascript" src="jsbn.js"></script>
+        <script language="JavaScript" type="text/javascript" src="random.js"></script>
+        <script language="JavaScript" type="text/javascript" src="hash.js"></script>
+        <script language="JavaScript" type="text/javascript" src="rsa.js"></script>
+        <script language="JavaScript" type="text/javascript" src="aes.js"></script>
+        <script language="JavaScript" type="text/javascript" src="api.js"></script>
+
+        <script>
+
+        function print(string)
+        {
+            document.write(string + "\n\n");
+        }
+        
+        var PassPhrase = "MattPassword";
+        var Bits = 1024;
+        
+        print("Matt's Pass: " + PassPhrase);
+        
+        var MattsRSAkey = cryptico.generateRSAKey(PassPhrase, Bits);
+        var MattsPublicKeyString = cryptico.publicKeyString(MattsRSAkey);
+        
+
+
+        print("<h1>Mensaje de SAM</h1>");
+
+        var PassPhrase = "SamPassword"; 
+        var Bits = 1024; 
+        var SamsRSAkey = cryptico.generateRSAKey(PassPhrase, Bits);
+        var PlainText = "Matt, Plotx ayuda.";
+
+        var EncryptionResult = cryptico.encrypt(PlainText, MattsPublicKeyString, SamsRSAkey);
+
+        print("Sam's public key ID: " + cryptico.publicKeyID(cryptico.publicKeyString(SamsRSAkey)));
+
+        print("The encrypted message:");
+        print(EncryptionResult.cipher);
+        
+        var DecryptionResult = cryptico.decrypt(EncryptionResult.cipher, MattsRSAkey);
+
+        print("The decrypted message:");
+        print(DecryptionResult.plaintext);     
+
+        print("The signature public key ID:");
+        print(cryptico.publicKeyID(DecryptionResult.publicKeyString));
+
+        </script>
+
+    </head>
+    
+    <body style="font-family: monospace; white-space:pre;">
+
+    </body>
+    
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

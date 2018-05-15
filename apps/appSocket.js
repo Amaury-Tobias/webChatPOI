@@ -1,48 +1,57 @@
 'use strict'
 
+const UserDB = require('../models/User')
+
 var apiSocket = function (io, users) {
     io.on('connection', (socket) => {
-        console.log("conectado");
-        
         io.to(socket.id).emit('test', '200 OK')
 
         socket.on('add user', (data) => {
-            //Buscar el data.user en la base de datos para tener su imagen de perfil
-            //agregar picture: (resultado de la base de datos) al usuario
-            if (users.length === 0) {
-                users.push({
-                    user: data.user,
-                    id: socket.id,
-                    estado: data.estado
-                })
-            } else {
-                let updateUser = users.find(item => {
-                    return item.user === data.user
-                })
-                updateUser = users.indexOf(updateUser)
-                if (updateUser != -1) {
-                    users.splice(updateUser, 1)
+            UserDB.find({ username: data.user }, (err, resultUser) => {
+                if (err) io.to(socket.id).emit('test', '500 EROR')
+                if (!resultUser) io.to(socket.id).emit('test', '404 EROR(User Not Fount')
+
+                if (users.length === 0) {
                     users.push({
-                        user: data.user,
+                        user: resultUser[0].username,
                         id: socket.id,
-                        estado: data.estado
+                        estado: data.estado,
+                        avatar: resultUser[0].avatar,
+                        key: data.key
                     })
                 } else {
-                    users.push({
-                        user: data.user,
-                        id: socket.id,
-                        estado: data.estado
+                    let updateUser = users.find(item => {
+                        return item.user === data.user
                     })
+                    updateUser = users.indexOf(updateUser)
+                    if (updateUser != -1) {
+                        users.splice(updateUser, 1)
+                        users.push({
+                            user: resultUser[0].username,
+                            id: socket.id,
+                            estado: data.estado,
+                            avatar: resultUser[0].avatar,
+                            key: data.key
+                        })
+                    } else {
+                        users.push({
+                            user: resultUser[0].username,
+                            id: socket.id,
+                            estado: data.estado,
+                            avatar: resultUser[0].avatar,
+                            key: data.key
+                        })
+                    }
                 }
-            }
-            io.sockets.emit('usersList', users)
+                io.sockets.emit('usersList', users)
+            })
         })
 
         socket.on('new message', (data) => {
             if (data.to === 'chatAll') {
                 socket.broadcast.emit('new message', {
                    username: data.username,
-                   message: data.message
+                   message: `${data.message} en general`
                })
             } else {
                 io.to(data.to).emit('new message', {
