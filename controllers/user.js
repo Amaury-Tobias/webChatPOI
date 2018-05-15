@@ -2,11 +2,10 @@
 
 const User = require('../models/User')
 const services = require('../services')
+var path = require('path')
 
 
 function signUp (req, res) {
-    console.log(req.body);
-    
     let user = new User({
         username: req.body.username,
         avatar: req.file.filename,
@@ -19,9 +18,10 @@ function signUp (req, res) {
             return res.status(500).send({ message: '[FAIL]' })
         }
 
-        return res.status(201)
+        return res.status(200)
         .cookie('jwtUser', services.createToken([user]), { expire: new Date() + 9999 })
-        .send({ message: '[OK]', token: services.createToken([user]) })
+        .sendFile('registrar.html', { root: path.join(__dirname, '../public') })
+
     })
 }
 

@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Registrar</title>
+    <script src="../jquery.js"></script>
 </head>
 <body>
-    <form action="signup" method="post" enctype="multipart/form-data">
-        <input type="text" name="username" placeholder="Username" />
-        <input type="password" name="password" placeholder="Password" />
-        <input type="file" name="avatar" accept=".jpg, .jpeg, .png">
-        <input type="submit" />
-    </form>
+    <script>
+        $(function () {
+            $(location).attr('href', 'http://localhost:8080/')
+        })
+    </script>
 </body>
 </html>

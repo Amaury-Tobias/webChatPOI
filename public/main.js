@@ -178,7 +178,6 @@ function addChatMessage (data) {
     let $usernameDiv = $('<span class="username"/>')
     .text(`${data.username}: `)
     .css('color', getUsernameColor(data.username))
-console.log(cryptico.decrypt(data.message.cipher, MyKey))
     let $messageBodyDiv = $('<span class="messageBody">')
     .text(cryptico.decrypt(data.message.cipher, MyKey).plaintext)
 
@@ -287,6 +286,21 @@ function getUsernameColor (username) {
     })
     .fail( data => {
     })
+  })
+  $('#formSUP').submit(function (event) {
+    event.preventDefault();
+    $(this).ajaxSubmit({
+      url: 'api/signup',
+      error: function (data) {
+        console.log(data);
+      },
+      succes: function (data) {
+        console.log(data);
+      }
+    })
+  })
+  $('#SignUp').click( function () {
+    $('#formSUp').submit();
   })
 
 

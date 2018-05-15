@@ -29,12 +29,13 @@
         </div>
         
         <div class='formUP'>
-            <form action="api/signup" method="post" enctype="multipart/form-data">
+            <form id='formSUp' action="api/signup" method="post" enctype="multipart/form-data">
               <h3 class="title">SignUP</h3>
               <input class="usernameInput" type="text" name="username" placeholder="Username" />
               <input class="passwordInput" type="password" name="password" placeholder="Password" />
               <input type="file" name="avatar" accept=".jpg, .jpeg, .png">
-              <input type="submit" />
+              <input id="SignUp" type="button" value="SignUp" onclick="window.location.href = 'http://localhost:8080/';">
+            </form>
           </form>
         </div>
 
