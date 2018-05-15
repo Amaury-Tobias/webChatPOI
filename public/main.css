@@ -4,6 +4,7 @@
 html {
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
+  overflow:hidden;
 }
 html, input {
   font-family:
@@ -19,6 +20,9 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+::-webkit-scrollbar {
+  width: 0px;
 }
 ul {
   list-style: none;
@@ -67,6 +71,7 @@ ul {
 }
 /* Contacts List */
 #listContainer{
+  display: none;
   overflow: scroll;
 }
 .contactList {
@@ -146,20 +151,22 @@ ul {
 .chat.page {
   display: none;
   grid-template-rows: 90% 10%;
-  grid-template-columns: 90% 10%;
+  grid-template-columns: 100%;
   grid-template-areas:
-      "chat chat"
-      "chatInput chatButtons";
+      "chat"
+      "chatInput";
 }
 
 /* Settings Page */
 .settings.page {
+  text-align: center;
+  grid-area: content-1;
   display: none;
 }
 
 /* Video Page */
 .video.page {
-  /*display: none;*/
+  display: none;
 }
 
 /* Font */
