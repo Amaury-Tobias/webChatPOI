@@ -6,6 +6,7 @@ var path = require('path')
 
 
 function signUp (req, res) {
+    if(!req.body.username || !req.body.password || !req.file) res.send('llena los campos')
     let user = new User({
         username: req.body.username,
         avatar: req.file.filename,
@@ -39,6 +40,7 @@ function signIn(req, res) {
     } else if (!req.cookies.jwtUser) {
         return res.status(403).send({ message: 'No tienes token de autorizacion' })
     } else {
+        
         let token = req.cookies.jwtUser
         
         services.decodeToken(token)
