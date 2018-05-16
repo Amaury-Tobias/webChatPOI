@@ -22,12 +22,7 @@ var context = canvas.getContext('2d')
 context.width = 120
 context.height = 120
 var $localVideo = $('#localVideo')
-navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-  .then((stream) => {
-      document.getElementById('localVideo').srcObject = stream;
-  })
-  .catch((err) => {
-  })
+
 
 var $window = $(window)
 var $usernameInput = $('.usernameInput')
@@ -50,10 +45,11 @@ var $userImage = $('.userImage')
 var username
 var estado
 var password
-var beep = new Audio('beep.mp3');
-var currentChat;
-var currentKey;
-var socket = io();
+var currentChat
+var currentKey
+var encoded = false
+var beep = new Audio('beep.mp3')
+var socket = io()
 
 $(function () {
   username = localStorage.getItem('username')
@@ -138,13 +134,23 @@ function addMessageElement (el) {
 function sendMessage () {
   var message = cleanInput($inputMessage.val().trim())
   addChatMessage({ username: username, message: message })
-
-  message = cryptico.encrypt(message, currentKey, MyKey)
-  var dataMessage = {
-    username: username,
-    message: message,
-    to: currentChat
+  if (encoded == true) {
+    message = cryptico.encrypt(message, currentKey, MyKey)
+    var dataMessage = {
+      username: username,
+      message: message,
+      to: currentChat,
+      encoded: encoded
+    }
+  } else {
+    var dataMessage = {
+      username: username,
+      message: message,
+      to: currentChat,
+      encoded: encoded
+    }
   }
+
   $inputMessage.val('')
   socket.emit('new message', dataMessage)
 
@@ -178,8 +184,17 @@ function addChatMessage (data) {
     let $usernameDiv = $('<span class="username"/>')
     .text(`${data.username}: `)
     .css('color', getUsernameColor(data.username))
-    let $messageBodyDiv = $('<span class="messageBody">')
-    .text(cryptico.decrypt(data.message.cipher, MyKey).plaintext)
+    
+    var $messageBodyDiv
+
+    if (data.encoded == true) {
+      $messageBodyDiv = $('<span class="messageBody">')
+      .text(cryptico.decrypt(data.message.cipher, MyKey).plaintext)
+    } else {
+      $messageBodyDiv = $('<span class="messageBody">')
+      .text(data.message)
+    }
+
 
     $messageDiv = $('<li class="message"/>')
     .data('username', data.username)
@@ -198,183 +213,200 @@ function getUsernameColor (username) {
 }
 
   // Element Events
-  $inputMessage.keydown (function (event) {
-    
-    var emojiMessage = $inputMessage.val()
+$inputMessage.keydown (function (event) {
+  
+  var emojiMessage = $inputMessage.val()
 
-    var find = /:(cry):/
-    var RE = new RegExp(find, 'g')
-    emojiMessage = emojiMessage.replace(RE, '😭')
+  var find = /:(cry):/
+  var RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '😭')
 
-    find = /:(happy):/
-    RE = new RegExp(find, 'g')
-    emojiMessage = emojiMessage.replace(RE, '😃')
-    
-    $inputMessage.val(emojiMessage)
+  find = /:(happy):/
+  RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '😃')
+  
+  $inputMessage.val(emojiMessage)
 
-    if (event.which === 13) {
-      sendMessage();
-    }
+  if (event.which === 13) {
+    sendMessage();
+  }
+})
+$window.click( function () {
+  $title.text(`FUSUFUM CHAT`);
+
+  $('.contactList .contact').each(function () {
+      $(this).removeClass('newMessageContact');
   });
 
-  $window.click( function () {
-    $title.text(`FUSUFUM CHAT`);
-
-    $('.contactList .contact').each(function () {
-        $(this).removeClass('newMessageContact');
-    });
-
-  })
-  $window.keydown( function (event) {
-    if (event.which === 13) {
-      if (username) {
-        //sendMessage();
-      } else {
-        setUsername();
-      }
-    }
-  });
-  $inputMessage.click( function () {
-    $inputMessage.focus();
-  });
-  $estadoInput.click( function () {
-    $estadoInput.focus();
-  });
-  $estadoInput.keydown( function (event) {
-    if (event.which === 13) {
-      localStorage.setItem('estado', $estadoInput.val());
-      estado = $estadoInput.val();
-      $chatPage.fadeIn();
-      $settingsPage.fadeOut();
-      socket.emit('add user', {
-        user: username,
-        estado: estado,
-        key: MyPKey
-      });
-    }
-  });
-  $contactList.on("click", ".contact", function () {
-    currentChat = $(this).attr('id');
-    currentKey = $(this).attr('key');
-    $('.contactList .contact').each(function () {
-      $(this).removeClass('activeContact');
-    });
-    $(this).addClass('activeContact');
-    if (currentChat == 'settings') {
-      estado = localStorage.getItem('estado')
-      $chatPage.fadeOut();
-      $settingsPage.fadeIn();
-      $estadoInput.val(estado);
-    } else if (currentChat == 'chatAll') {
-      socket.emit('print', 'print');
-      $chatPage.fadeIn();
-      $settingsPage.fadeOut();
+})
+$window.keydown( function (event) {
+  if (event.which === 13) {
+    if (username) {
+      //sendMessage();
     } else {
-      $chatPage.fadeIn();
-      $settingsPage.fadeOut();
+      setUsername();
+    }
+  }
+})
+$inputMessage.click( function () {
+  $inputMessage.focus();
+})
+$estadoInput.click( function () {
+  $estadoInput.focus();
+})
+$estadoInput.keydown( function (event) {
+  if (event.which === 13) {
+    localStorage.setItem('estado', $estadoInput.val());
+    estado = $estadoInput.val();
+    $chatPage.fadeIn();
+    $settingsPage.fadeOut();
+    socket.emit('add user', {
+      user: username,
+      estado: estado,
+      key: MyPKey
+    });
+  }
+})
+$contactList.on("click", ".contact", function () {
+  currentChat = $(this).attr('id');
+  currentKey = $(this).attr('key');
+  $('.contactList .contact').each(function () {
+    $(this).removeClass('activeContact');
+  });
+  $(this).addClass('activeContact');
+  if (currentChat == 'settings') {
+    estado = localStorage.getItem('estado')
+    $chatPage.fadeOut();
+    $settingsPage.fadeIn();
+    $estadoInput.val(estado);
+  } else if (currentChat == 'chatAll') {
+    socket.emit('print', 'print');
+    $chatPage.fadeIn();
+    $settingsPage.fadeOut();
+  } else {
+    $chatPage.fadeIn();
+    $settingsPage.fadeOut();
+  }
+})
+$closeSession.on('click', function () {
+  localStorage.removeItem('username');
+  $.post('/api/signout')
+  .done( data => {
+    $loginPage.fadeIn();
+    $chatPage.fadeOut();
+    $loginPage.on('click');
+    $chatPage.off('click');
+    location.reload();
+  })
+  .fail( data => {
+  })
+})
+$('#formSUP').submit(function (event) {
+  event.preventDefault();
+  $(this).ajaxSubmit({
+    url: 'api/signup',
+    error: function (data) {
+      console.log(data);
+    },
+    succes: function (data) {
+      console.log(data);
+    }
+  })
+})
+$('#SignUp').click( function () {
+  $('#formSUp').submit();
+})
+$('#encoded').click(function () {
+  encoded = !encoded
+  if (encoded) {
+    $(this).text('🔐')
+  } else {
+    $(this).text('🔓')
+  }
+})
+
+
+
+socket.on('usersList', (data) => {
+  $contactList.html("");
+  $contactList.append(`
+  <li class="contact" id="settings">
+  <img src="profilePictures/settings.png" class="contactImage">
+  <p class="contactName">Settings</p>
+  </li>
+  `);
+  $contactList.append(`
+  <li class="contact" id="chatAll">
+  <img src="profilePictures/general.png" class="contactImage">
+  <p class="contactName">General (${data.length - 1})</p>
+  </li>
+  `);
+  data.forEach(element => {
+    if (element.user != username) {        
+      var $contactName = $('<p class="contactName" />')
+      .text(`${element.user} (${element.estado})`);
+      if (typeof(element.avatar) == 'undefined') {
+        var $contactImage = $('<img class="contactImage" />')
+        .attr('src', `profilePictures/default.png`);
+      } else {
+        var $contactImage = $('<img class="contactImage" />')
+        .attr('src', `profilePictures/${element.avatar}`);
+      }
+      var $newContact = $('<li />')
+      .addClass('contact')
+      .attr('id', element.id)
+      .attr('key', `${element.key}`)
+      .attr('username', element.user)
+      .append($contactImage, $contactName);
+      $contactList.append($newContact);
     }
   });
-  $closeSession.on('click', function () {
-    localStorage.removeItem('username');
-    $.post('/api/signout')
-    .done( data => {
-      $loginPage.fadeIn();
-      $chatPage.fadeOut();
-      $loginPage.on('click');
-      $chatPage.off('click');
-      location.reload();
-    })
-    .fail( data => {
-    })
-  })
-  $('#formSUP').submit(function (event) {
-    event.preventDefault();
-    $(this).ajaxSubmit({
-      url: 'api/signup',
-      error: function (data) {
-        console.log(data);
-      },
-      succes: function (data) {
-        console.log(data);
-      }
-    })
-  })
-  $('#SignUp').click( function () {
-    $('#formSUp').submit();
-  })
+});
 
-
-
-  socket.on('usersList', (data) => {
-    $contactList.html("");
-    $contactList.append(`
-    <li class="contact" id="settings">
-    <img src="profilePictures/settings.png" class="contactImage">
-    <p class="contactName">Settings</p>
-    </li>
-    `);
-    $contactList.append(`
-    <li class="contact" id="chatAll">
-    <img src="profilePictures/general.png" class="contactImage">
-    <p class="contactName">General (${data.length - 1})</p>
-    </li>
-    `);
-    data.forEach(element => {
-      if (element.user != username) {        
-        var $contactName = $('<p class="contactName" />')
-        .text(`${element.user} (${element.estado})`);
-        if (typeof(element.avatar) == 'undefined') {
-          var $contactImage = $('<img class="contactImage" />')
-          .attr('src', `profilePictures/default.png`);
-        } else {
-          var $contactImage = $('<img class="contactImage" />')
-          .attr('src', `profilePictures/${element.avatar}`);
-        }
-        var $newContact = $('<li />')
-        .addClass('contact')
-        .attr('id', element.id)
-        .attr('key', `${element.key}`)
-        .attr('username', element.user)
-        .append($contactImage, $contactName);
-        $contactList.append($newContact);
-      }
-    });
-  });
-
-  socket.on('new message', (data) => {
-    addChatMessage(data);
-    $title.text(`Nuevo mensaje de ${data.username}`);
+socket.on('new message', (data) => {  
+  addChatMessage(data);
+  $title.text(`Nuevo mensaje de ${data.username}`);
+  if (data.encoded === true) {
     new Notification(`${data.username} dice:`,{
       body: `${cryptico.decrypt(data.message.cipher, MyKey).plaintext}`
     });
-    beep.play();
-    $('.contactList .contact').each(function () {
-      var newMessageUsername = $(this).attr('username');
-      if (newMessageUsername == data.username) {
-        $(this).addClass('newMessageContact');
-      }
+  } else {
+    new Notification(`${data.username} dice:`,{
+      body: `${data.message}`
     });
-  });
+  }
 
-  socket.on('reconnect', () => {
-    log('Reconectado');
-    if (username) {
-      socket.emit('add user', {
-        user: username,
-        estado: estado,
-        key: MyPKey
-      });
+  beep.play();
+  $('.contactList .contact').each(function () {
+    var newMessageUsername = $(this).attr('username');
+    if (newMessageUsername == data.username) {
+      $(this).addClass('newMessageContact');
     }
   });
+});
 
-  socket.on('disconnect', () => {
-    log('Error de conexión');
-  });
+socket.on('reconnect', () => {
+  log('Reconectado');
+  if (username) {
+    socket.emit('add user', {
+      user: username,
+      estado: estado,
+      key: MyPKey
+    });
+  }
+});
 
-  socket.on('reconnect_error', () => {
-    log('Error en el intento de reconexión');
-  });
+socket.on('disconnect', () => {
+  log('Error de conexión');
+});
 
+socket.on('reconnect_error', () => {
+  log('Error en el intento de reconexión');
+});
+
+function callWindow() {
+  window.open(`http://localhost:8080/api/v/?v=${socket.id}`, '_blank')
+}
 
 /*
 var video;

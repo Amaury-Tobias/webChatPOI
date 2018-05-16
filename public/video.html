@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Videollamada</title>
+    <script src="http://192.168.1.7:8080/socket.io/socket.io.js"></script>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+
+</head>
+<body>
+    VIDEOLLAMADA
+    <video autoplay playsinline id="localVideo"></video>
+    <img id='parthner' src="" alt="">
+<script>
+    var urlParams = new URLSearchParams(window.location.search)
+    
+    var socket = io('/video')
+
+    var canvas = document.createElement('canvas')
+    var context = canvas.getContext('2d')
+    var video = document.getElementById('localVideo');
+
+    context.width = 120
+    context.height = 120
+
+    navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+    .then((stream) => {
+        document.getElementById('localVideo').srcObject = stream;
+    })
+    .catch((err) => {
+    })
+
+    socket.emit('join', urlParams.get('v'));
+
+    function streamFrame(message) {
+        let dataMessage = {
+            room: urlParams.get('v'),
+            video: message
+        }
+        socket.emit('stream', dataMessage)
+    }
+
+    function sendFrame(video, context) {
+    context.drawImage(video, 0, 0, context.width, context.height);
+    streamFrame(canvas.toDataURL('image/webp'));
+    }
+
+    setInterval(function() {
+        sendFrame(video, context);
+    }, 100);
+
+    socket.on('frameStream', (data) => {
+        document.getElementById('parthner').src = data.video;
+    })
+
+</script>
+</body>
+</html>

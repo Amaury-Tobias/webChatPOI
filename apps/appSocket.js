@@ -3,6 +3,9 @@
 const UserDB = require('../models/User')
 
 var apiSocket = function (io, users) {
+
+    var videoNSP = io.of('/video')
+
     io.on('connection', (socket) => {
         io.to(socket.id).emit('test', '200 OK')
 
@@ -54,10 +57,7 @@ var apiSocket = function (io, users) {
                    message: `${data.message} en general`
                })
             } else {
-                io.to(data.to).emit('new message', {
-                    username: data.username,
-                    message: data.message
-                })
+                io.to(data.to).emit('new message', data)
             }
         })
 
@@ -72,7 +72,7 @@ var apiSocket = function (io, users) {
             }
         })
 
-        socket.on('swift', data =>{
+        socket.on('swift', (data) =>{
             io.sockets.emit('new message', {
                 username: data.username,
                 message: data.message
@@ -85,6 +85,17 @@ var apiSocket = function (io, users) {
             users.forEach(element => {
                 console.log(element);
             });
+        })
+    })
+
+    videoNSP.on('connection', (socket) => {
+        
+        socket.on('join', (data) => {
+            socket.join(data)
+        })
+
+        socket.on('stream', (data) => {
+            socket.in(data.room).broadcast.emit('frameStream', data)
         })
     })
 }

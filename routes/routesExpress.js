@@ -30,4 +30,10 @@ api.post('/signout', (req, res) => {
 })
 
 
+api.get('/v', (req, res) => {
+    res.sendFile('video.html', { root: path.join(__dirname, '../public') })
+
+})
+
+
 module.exports = api
