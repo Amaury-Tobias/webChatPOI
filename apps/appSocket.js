@@ -7,7 +7,7 @@ var apiSocket = function (io, users) {
 
     var videoNSP = io.of('/video')
 
-    io.on('connection', (socket) => {
+    io.on('connection', (socket) => {        
         io.to(socket.id).emit('test', '200 OK')
 
         socket.on('add user', (data) => {
@@ -129,17 +129,31 @@ var apiSocket = function (io, users) {
                 console.log(element);
             });
         })
+
+        socket.on('updateUser', (data) => {
+            console.log(data);
+            UserDB.find({ username: data.username }, (err, user) => {
+                if (err) console.log('UserFindError')
+                if (!user) console.log('UserFindNULL')
+
+                
+
+                let ponits = parseInt(user[0].gamePoints) + parseInt(data.points)
+                UserDB.findOneAndUpdate({ username: data.username }, { gamePoints: ponits.toString() }, (err, doc) => {
+                    if (err) console.log('UserUpdateError')
+                })
+            })
+        })
     })
 
     videoNSP.on('connection', (socket) => {
-        
         socket.on('join', (data) => {
             socket.join(data)
         })
 
         socket.on('stream', (data) => {
             socket.in(data.room).broadcast.emit('frameStream', data)
-        })
+        })        
     })
 }
 

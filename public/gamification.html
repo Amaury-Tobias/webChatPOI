@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Gamification</title>
+    <script src="http://localhost:8080/jquery.js"></script>
+
+</head>
+<body>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search)
+        let username = urlParams.get('u')
+        var coins = urlParams.get('gp')
+        function buyAvatar(avatar) {
+            $.post('buy', {avatarBuy: avatar, buy: true, username: username})
+            .done((data) => {
+
+                let actualCoins = parseInt(document.getElementById('coins').innerText)
+                actualCoins = actualCoins- 200
+                document.getElementById('coins').innerText = actualCoins
+            })
+            .fail((data) => {
+
+            })
+        }
+
+        function equipAvatar(avatar) {
+            $.post('equip', {avatar: avatar, username: username})
+            .done((data) => {
+                console.log(data);
+            })
+            .fail((data) => {
+
+            })
+        }
+
+    </script>
+    <h1 id="nombre"></h1>
+    <h1 id="coins"></h1>
+    <ul>
+        <li>avatar0 <button onclick="equipAvatar('0')">equipar</button> </li>
+        <li>avatar1 <button onclick="buyAvatar('a1')">200 FUSUFUMCOINS</button> <button onclick="equipAvatar('1')">equipar</button> </li>
+        <li>avatar2 <button onclick="buyAvatar('a2')">200 FUSUFUMCOINS</button> <button onclick="equipAvatar('2')">equipar</button> </li>
+        <li>avatar3 <button onclick="buyAvatar('a3')">200 FUSUFUMCOINS</button> <button onclick="equipAvatar('3')">equipar</button> </li>
+        <li>avatar4 <button onclick="buyAvatar('a4')">200 FUSUFUMCOINS</button> <button onclick="equipAvatar('4')">equipar</button> </li>
+        <li>avatar5 <button onclick="buyAvatar('a5')">200 FUSUFUMCOINS</button> <button onclick="equipAvatar('5')">equipar</button> </li>
+        <li>avatar6 <button onclick="buyAvatar('a6')">200 FUSUFUMCOINS</button> <button onclick="equipAvatar('6')">equipar</button> </li>
+        <li>avatar7 <button onclick="buyAvatar('a7')">200 FUSUFUMCOINS</button> <button onclick="equipAvatar('7')">equipar</button> </li>
+    </ul>
+
+    <script>
+        document.getElementById('nombre').innerText = username
+        document.getElementById('coins').innerText = coins
+
+    </script>
+
+</body>
+</html>

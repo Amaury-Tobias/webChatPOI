@@ -11,7 +11,16 @@ function signUp (req, res) {
         username: req.body.username,
         avatar: req.file.filename,
         password: req.body.password,
-        gamePoinst: 0
+        gamePoints: '0',
+        avatarEquipado: '0',
+        a1: false,
+        a2: false,
+        a3: false,
+        a4: false,
+        a5: false,
+        a6: false,
+        a7: false,
+        a8: false
     })
 
     user.save((err) => {
@@ -22,7 +31,6 @@ function signUp (req, res) {
         return res.status(200)
         .cookie('jwtUser', services.createToken([user]), { expire: new Date() + 9999 })
         .sendFile('registrar.html', { root: path.join(__dirname, '../public') })
-
     })
 }
 

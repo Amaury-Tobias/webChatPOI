@@ -51,6 +51,7 @@ var currentKey
 var encoded = false
 var beep = new Audio('beep.mp3')
 var socket = io()
+var allUser;
 
 $(function () {
   username = localStorage.getItem('username')
@@ -62,6 +63,8 @@ $(function () {
     
     localStorage.setItem('username', data.dataUser[0].username)
     username = data.dataUser[0].username
+
+    allUser = data.dataUser[0]
 
     $loginPage.fadeOut()
     $chatPage.show()
@@ -439,7 +442,7 @@ socket.on('reconnect_error', () => {
 });
 
 function callWindow() {
-  window.open(`http://localhost:8080/api/v/?v=${socket.id}`, '_blank')
+  window.open(`http://localhost:8080/api/v?v=${socket.id}`, '_blank')
   var dataMessage = {
     username: username,
     message: `hey estoy en una video llamada, Unete: http://localhost:8080/api/v/?v=${socket.id}`,
@@ -448,4 +451,20 @@ function callWindow() {
     call: true
   }
   socket.emit('new message', dataMessage)
+}
+
+function gameWindow() {
+  window.open(`http://localhost:8080/api/game?u=${username}`, '_blank')
+}
+
+function gameWindow() {
+  window.open(`http://localhost:8080/api/game?u=${username}&ae=${allUser.avatarEquipado}`, '_blank')
+}
+
+function gamification() {
+  window.open(`http://localhost:8080/api/gamification?u=${allUser.username}&ae=${allUser.avatarEquipado}&gp=${allUser.gamePoints}&a1=${allUser.a1}&a2=${allUser.a2}&a3=${allUser.a3}&a4=${allUser.a4}&a5=${allUser.a5}&a6=${allUser.a6}&a7=${allUser.a7}&a8=${allUser.a8}`, '_blank')
+}
+
+function mailWindow() {
+  window.open(`http://localhost:8080/api/s`, '_blank')
 }
