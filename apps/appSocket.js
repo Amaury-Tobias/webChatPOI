@@ -1,6 +1,7 @@
 'use strict'
 
 const UserDB = require('../models/User')
+const MessageDB = require('../models/message')
 
 var apiSocket = function (io, users) {
 
@@ -50,15 +51,57 @@ var apiSocket = function (io, users) {
             })
         })
 
-        socket.on('new message', (data) => {
+        socket.on('give message', (data) => {
+            MessageDB.find({ userId: data.user }, (err, resultMessage) => {
+                if (err) io.to(socket.id).emit('test', '500 EROR')
+                if (!resultMessage) io.to(socket.id).emit('test', '404 EROR(Messages Not Fount')
+
+                resultMessage.forEach(element => {
+                    io.to(socket.id).emit('new message', element)
+                })
+            })
+        })
+
+        socket.on('new message', (data) => {            
             if (data.to === 'chatAll') {
                 socket.broadcast.emit('new message', {
                    username: data.username,
-                   message: `${data.message} en general`
+                   message: `${data.message} :general`
                })
             } else {
                 io.to(data.to).emit('new message', data)
             }
+
+            UserDB.find({ username: data.username }, (err, resultUser) => {
+                if (err) return console.log('error');
+                if (!resultUser) return console.log('usuario nulo');
+                
+                if (data.to === 'chatAll') {
+                    console.log('pos nada');
+                } else {
+                    let StoreMessage = new MessageDB({
+                        userId: data.username,
+                        username: data.username,
+                        message: data.message,
+                        encoded: data.encoded
+                    })
+    
+                    let StoreMessage2 = new MessageDB({
+                        userId: data.toU,
+                        username: data.username,
+                        message: data.message,
+                        encoded: data.encoded
+                    })
+    
+                    StoreMessage.save((err) => {
+                        if (err) return console.log('Store Message Error');
+                    })
+    
+                    StoreMessage2.save((err) => {
+                        if (err) return console.log('Store Message Error');
+                    })
+                }
+            })
         })
 
         socket.on('disconnect', () => {

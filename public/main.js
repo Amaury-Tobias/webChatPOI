@@ -46,6 +46,7 @@ var username
 var estado
 var password
 var currentChat
+var currentChatUser
 var currentKey
 var encoded = false
 var beep = new Audio('beep.mp3')
@@ -76,6 +77,9 @@ $(function () {
       user: username,
       estado: estado,
       key: MyPKey
+    })
+    socket.emit('give message', {
+      user: username
     })
   })
   .fail( (data) => {
@@ -111,6 +115,9 @@ function setUsername () {
         estado: estado,
         key: MyPKey
       })
+      socket.emit('give message', {
+        user: username
+      })
     })
     .fail( (data) => {
       $usernameInput.val("error de login")
@@ -140,14 +147,16 @@ function sendMessage () {
       username: username,
       message: message,
       to: currentChat,
-      encoded: encoded
+      encoded: encoded,
+      toU: currentChatUser
     }
   } else {
     var dataMessage = {
       username: username,
       message: message,
       to: currentChat,
-      encoded: encoded
+      encoded: encoded,
+      toU: currentChatUser
     }
   }
 
@@ -225,6 +234,30 @@ $inputMessage.keydown (function (event) {
   RE = new RegExp(find, 'g')
   emojiMessage = emojiMessage.replace(RE, '😃')
   
+  find = /:(sad):/
+  RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '😢')
+
+  find = /:(glass):/
+  RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '😎')
+
+  find = /:(zanahoria):/
+  RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '🍆')
+
+  find = /:(alien):/
+  RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '👽')
+
+  find = /:(B):/
+  RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '🅱️')
+
+  find = /:(A):/
+  RE = new RegExp(find, 'g')
+  emojiMessage = emojiMessage.replace(RE, '🅰️')
+
   $inputMessage.val(emojiMessage)
 
   if (event.which === 13) {
@@ -270,6 +303,7 @@ $estadoInput.keydown( function (event) {
 $contactList.on("click", ".contact", function () {
   currentChat = $(this).attr('id');
   currentKey = $(this).attr('key');
+  currentChatUser = $(this).attr('username');
   $('.contactList .contact').each(function () {
     $(this).removeClass('activeContact');
   });
@@ -406,79 +440,12 @@ socket.on('reconnect_error', () => {
 
 function callWindow() {
   window.open(`http://localhost:8080/api/v/?v=${socket.id}`, '_blank')
+  var dataMessage = {
+    username: username,
+    message: `hey estoy en una video llamada, Unete: http://localhost:8080/api/v/?v=${socket.id}`,
+    to: currentChat,
+    encoded: false,
+    call: true
+  }
+  socket.emit('new message', dataMessage)
 }
-
-/*
-var video;
-var img;
-
-var answer = false;
-
-
-
-document.addEventListener('DOMContentLoaded',function () {
-  document.getElementById("answerButton").disabled = true;
-  video = document.getElementById("video");
-  img = document.getElementById("reciver");
-
-
-
-    function success(stream) {
-      video.src = window.URL.createObjectURL(stream);
-      video.play();
-    }
-});
-
-
-
-socket.on("frameStream", function (data) {
-  document.getElementById(data.callFrom).src = data.data;
-});
-
-socket.on("NewCall",function (data) {
-  document.getElementById("answerButton").disabled = false;
-  setTimeout(() => {
-    if (answer) {
-      addCam(data.callFrom);
-    }
-  }, 5000);
-});
-
-
-
-function addCam(id) {
-  var newCam = `<img id="${id}"></img>`
-  var container = document.getElementById("callsContainer");
-  container.innerHTML += newCam;
-};
-
-function answerFunction() {
-  answer = true;
-}
-
-function callFunction() {
-  var calling = {
-    "callFrom": `${socket.id}`,
-    "callTO": `${document.getElementById("username").value}`
-  };
-  socket.emit("callFromTo", calling);
-}
-
-function sendFrame(video, context) {
-  context.drawImage(video, 0, 0, context.width, context.height);
-  var callStream = {
-    "callFrom": `${socket.id}`,
-    "data": canvas.toDataURL('image/webp')
-  };
-  socket.emit('stream', callStream);
-}
-
-if (true) {
-  setInterval(function () {
-    sendFrame(video, context);
-    console.log("FrameEnviado");
-  }, 100);
-};
-
-
-*/

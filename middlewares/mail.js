@@ -2,8 +2,6 @@
 
 const nodemailer = require('nodemailer-promise')
 
-//inline IF ( BOOL ? "True" : "False" )
-
 function createTransport (fromUser, passUser) {
     return new Promise ((resolve, reject) => {
         try {
@@ -23,6 +21,8 @@ function createTransport (fromUser, passUser) {
 }
 
 var sendMail = function (req, res, next) {
+    console.log(req.query);
+    
     createTransport(req.query.from, req.query.pass)
     .then((Sender) => {
         Sender({

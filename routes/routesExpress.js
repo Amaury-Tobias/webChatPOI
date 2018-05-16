@@ -11,7 +11,7 @@ const upload = multer({ dest: 'public/profilePictures/' })
 var path = require('path')
 
 api.get('/send', auth, mailMiddleware, (req, res) => {
-    res.status(200).end({ message: 'Correo Enviado' })
+    res.status(200).end('Correo Enviado')
 })
 
 
@@ -32,6 +32,11 @@ api.post('/signout', (req, res) => {
 
 api.get('/v', (req, res) => {
     res.sendFile('video.html', { root: path.join(__dirname, '../public') })
+
+})
+
+api.get('/s', (req, res) => {
+    res.sendFile('mail.html', { root: path.join(__dirname, '../public') })
 
 })
 

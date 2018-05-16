@@ -13,25 +13,6 @@ var users = []
 
 appSocket(io, users)
 
-/*
-  io.on('connection', (socket) => {
-    socket.on('callFromTo', (data) =>{
-      users.forEach(element => {
-        if (element.user == data.callTO) {
-          winston.info(`Call from ${data.callFrom} \nto ${element.id}`);
-          io.to(element.id).emit('NewCall', data);
-        }
-      });
-    });
-
-    socket.on('stream', (data) => {
-      io.emit('frameStream',data);
-    });
-  });
-*/
-
-
-
 mongoose.connect(config.db, (err, res) => {
   if (err) {
     return console.log(`Error DB connection ${err}`)
