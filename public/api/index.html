@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | POI AA</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>  
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+      var gameInstance = UnityLoader.instantiate("gameContainer", "Build/POI AA Build.json", {onProgress: UnityProgress});
+    </script>
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+    crossorigin="anonymous"></script>
+
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>  </head>
+  <body>
+
+<script>
+  var socket = io()
+  function save(username, gamePoints) {
+    socket.emit('updateUser', {username: username, points: gamePoints})
+  }
+  socket.emit('updateUser', {username: "asdf", points: 34})
+
+</script>
+
+
+    <button onclick="save('ary', 777)">EPALE</button>
+      <h1>Name: </h1><h1 id="name">BURBUGA</h1>
+      <br>
+    <h1>Avatar: </h1><h1 id="avatar">5</h1>
+      <br>
+    <h1>Score: </h1><input type="text" id="score">0</input >
+
+
+
+    <div class="webgl-content">
+      <div id="gameContainer" style="width: 960px; height: 600px"></div>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
+        <div class="title">POI AA</div>
+      </div>
+    </div>
+  </body>
+</html>
