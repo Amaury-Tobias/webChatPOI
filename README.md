@@ -1,23 +1,12 @@
 # webChatPOI
 Backend y Frontend para un servidor de webChat con videollamada.
 
-Necesita de:
-* nodeJS
-* mongoDB
-
-**SETUP**
-
-```[javascript]
-npm install
-npm start
-```
-
-
 **TODO**
+Preparando para una Gran Actualizacion (Separacion de Front y Back) agregar VueJS
+Manejo de videollamada con WebRTC
+Por ahora todo esta roto.
 
-* Video llamada por Socket (primer soporte de video ya en codigo pero deshabilitado).
-* Hoja de estilo CSS (completa). 
-* Login de usuarios.
-* MongoDB (storage)).
+Alpha1 liberada entre el 20 y 27 de enero.
+
 
 ⓒAmaury Tobias Quiroz | UANL-FCFM
